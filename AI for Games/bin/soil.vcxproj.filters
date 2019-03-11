@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\SOIL.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\image_DXT.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\image_helper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\stb_image_aug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\SOIL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\image_DXT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\image_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\stb_image_aug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\stbi_DDS_aug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\soil\src\stbi_DDS_aug_c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{316D2D2B-AEEA-3EA6-A09C-ACB549D45C67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3F524A9E-C498-35C3-BE04-C0E6F0FF56D2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

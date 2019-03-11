@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\bin\CMakeFiles\89569334e0e813482f3ffa8d8d78f2ab\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{2F19305B-2C9C-320E-8B0A-517B161F076B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
