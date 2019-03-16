@@ -16,7 +16,7 @@ const int UnMortgagePastRound = 5;
 const bool FreeParkingRule = true;
 const int JailFee = 50;
 const int RollsPerGame = 800; //Total rolls per game
-const int Games = 3; //Total amount of games
+const int Games = 1; //Total amount of games
 const int PlayerNum = 4;
 //Names of all Streets in order
 const std::string StreetNames[] = {
