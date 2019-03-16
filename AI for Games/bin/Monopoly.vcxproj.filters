@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\Shaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\Genetic-Algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\MConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\MFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\MMortgage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\MTrade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\Net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\Shaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\TimeFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Github\AI_Project\AI for Games\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\primitive.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="C:\Github\AI_Project\AI for Games\src\Tutorials\Monopoly\primitive.fs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{07614A23-7702-359B-880E-BDE9B7268138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0A668413-A5AA-3553-80D1-8D74DDE30C85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{705D0E34-4FA2-3D02-807F-B2BBCBFAB879}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

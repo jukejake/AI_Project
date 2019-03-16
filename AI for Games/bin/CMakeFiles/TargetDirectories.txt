@@ -1,7 +1,8 @@
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/soil.dir
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/gl3w.dir
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/imgui.dir
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/Assignment 3.dir
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/Tutorial 4.dir
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/ALL_BUILD.dir
-C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/CMakeFiles/ZERO_CHECK.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/soil.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/gl3w.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/Monopoly.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/imgui.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/Assignment 3.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/Tutorial 4.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/ALL_BUILD.dir
+C:/Github/AI_Project/AI for Games/bin/CMakeFiles/ZERO_CHECK.dir
