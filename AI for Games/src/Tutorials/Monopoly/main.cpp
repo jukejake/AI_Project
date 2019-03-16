@@ -41,13 +41,47 @@ glm::mat4 projectionMatrix;
 // Textures
 GLuint XTexture, OTexture, BTexture, RTexture;
 
+int games_Finished = 0;
+bool game_NotInprogress = true;
+
+MonopolyGame game;
 
 
 void UserInitialize() {
 	/* initialize random seed: */
 	srand(time(NULL));
 
-	PlayGameInCMD();
+	//initialize Starting values
+	Net blank(topology);
+	for (int i = 0; i < PlayerNum; i++) {
+		Data_Player Temp;
+		Data_Info.Players.push_back(Temp);
+		network[i] = blank;
+	}
+	for (int i = 0; i < 41; i++) {
+		Data_Info.LandOwnerShip[i] = -1;
+	}
+
+	//Display at the end
+	//std::cout << std::endl << std::endl;
+	//if (!Display) { GetData(); }
+}
+void UserUpdate() {
+	//Keep going until game games are done.
+
+	if (!game_NotInprogress) {
+		game.Move();
+		if (1 >= (PlayerNum - game.AmountDead)) {
+			game.EndGame();
+			games_Finished += 1;
+			if (games_Finished < Games) { game = MonopolyGame(); game.StartGame(); }
+			else { game_NotInprogress = true; games_Finished = 0; }
+		}
+		
+		std::cout << game.CurrentPlayer << ": " << game.Output << std::endl;
+	}
+	//if (Display) { DisplayStats(players, y); }
+	
 }
 
 // Functions
@@ -126,6 +160,7 @@ void Initialize()
 
 void Update(float a_deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE)) { glfwSetWindowShouldClose(window, true); }
+	UserUpdate();
 	
 }
 
@@ -150,6 +185,7 @@ void GUI(){
 	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f);
 	{
 		if (ImGui::Button("Button")) {}
+		if (ImGui::Button("Start Game")) { game = MonopolyGame(); game.StartGame(); game_NotInprogress = false; }
 		ImGui::Text("Text");
 	}
 	ImGui::End();

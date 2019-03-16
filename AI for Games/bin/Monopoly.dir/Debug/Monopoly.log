@@ -2,18 +2,17 @@
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(118): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(164): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(173): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(647): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(657): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(888): warning C4018: '<': signed/unsigned mismatch
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(890): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(914): warning C4018: '>': signed/unsigned mismatch
-c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(48): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(719): warning C4018: '<': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(721): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(745): warning C4018: '>': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(789): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(52): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mconstants.h(166): warning C4244: 'initializing': conversion from 'float' to 'T', possible loss of data
           with
           [
               T=int
           ]
-  c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(167): note: see reference to function template instantiation 'T GetAverageVector<int>(std::vector<int,std::allocator<_Ty>>)' being compiled
+  c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(171): note: see reference to function template instantiation 'T GetAverageVector<int>(std::vector<int,std::allocator<_Ty>>)' being compiled
           with
           [
               T=int,

@@ -5,6 +5,7 @@
 #include <windows.h>	//WinApi header
 #include <algorithm>    // std::random_shuffle
 #include <random>		//random_device, sort, random_shuffle
+#include <functional>	//Bind
 
 #include "MMortgage.h"
 #include "MTrade.h"
@@ -17,8 +18,6 @@ int y = 0;
 int x = 120;
 
 std::vector<std::string> StuffAndThings;
-
-
 
 #pragma region Nerual Network
 //33 inputs, 10 outputs. 
@@ -238,7 +237,7 @@ void GetData() {
 	
 
 }
-void DisplayStats(PlayerInfo players[], int y) {
+void DisplayStats(PlayerInfo(&players)[PlayerNum], int y) {
 	std::cout << std::endl;
 	y += 55;
 
@@ -361,7 +360,7 @@ void ColourString(std::string& Output) {
 	std::cout << "|";
 	Output = "";
 }
-void SetPlayerStats(PlayerInfo players[]) {
+void SetPlayerStats(PlayerInfo(&players)[PlayerNum]) {
 	//Reset Values
 	for (int p = 0; p < PlayerNum; p++) {
 		players[p].AI = true;
@@ -410,7 +409,7 @@ void SetPlayerStats(PlayerInfo players[]) {
 
 #pragma region other
 
-void CalculateCard(PlayerInfo players[], int p, std::string card, int& AIP, std::string& Output) {
+void CalculateCard(PlayerInfo(&players)[PlayerNum], int p, std::string card, int& AIP, std::string& Output) {
 
 	std::string ADD;
 	if (card == "-1") {}
@@ -603,7 +602,7 @@ void CalculateCard(PlayerInfo players[], int p, std::string card, int& AIP, std:
 	*/
 }
 
-int IsDead(PlayerInfo players[], int p, std::string& Output) {
+int IsDead(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 	std::string ADD;
 	if (players[p].Money <= 0) {
 		MortgageProperty(players, p, Output);
@@ -618,261 +617,88 @@ int IsDead(PlayerInfo players[], int p, std::string& Output) {
 	else { return 0; }
 }
 
-bool Monopoly(PlayerInfo players[]) {
-	/*
-		If the Player has to pay another Player money while not on their turn,
-		and falls bellow $0 they will not die until their turn
-		to give them a chance to save themselves.
-	*/
-	//Random Numbers
-	std::random_device rd;
-	std::mt19937_64 mt(rd());
-	std::uniform_real_distribution<double> distribution(0, 1);
 
+
+//bool Monopoly(PlayerInfo players[]) {
+//	/*
+//		If the Player has to pay another Player money while not on their turn,
+//		and falls bellow $0 they will not die until their turn
+//		to give them a chance to save themselves.
+//	*/
+//
+//	//Game
+//	while (rolls < (RollsPerGame*PlayerNum)) {
+//		if (1 >= (PlayerNum - AmountDead)) { break; }
+//
+//		//Display the roll number.
+//		if (Display) {
+//			COORD xy = { (0 * x), y };
+//			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), xy);
+//			ADD = (std::to_string((int)ceil(rolls*0.25f))); padTo(ADD, 3); Output.append("[R:" + ADD + "] ");
+//		}
+//	}
+//	return true;
+//}
+
+class MonopolyGame
+{
+public:
+	MonopolyGame();
+	~MonopolyGame();
+	PlayerInfo players[PlayerNum];
+
+	void StartGame();//PlayerInfo(&players)[PlayerNum]
+	void EndGame();
+	void Move();
+	int RollDice();
+
+	int AmountInParking;
+	int AmountDead;
+	int rolls;
+	std::string Output;
+	std::string ADD;
+	int CurrentPlayer;
+private:
+	std::vector<std::string> chest;
+	std::vector<std::string> chance;
+	std::default_random_engine generator;
+};
+
+MonopolyGame::MonopolyGame() {
+	CurrentPlayer = 0;
+	AmountInParking = 0;
+	AmountDead = 0;
+	rolls = 0;
+	Output = "";
+	ADD = "";
+	for (int p = 0; p < PlayerNum; p++) { players[p] = PlayerInfo(); }
+}
+MonopolyGame::~MonopolyGame() {
+}
+int MonopolyGame::RollDice() {
+	std::uniform_int_distribution<int> distribution(0, 35);
+	return distribution(generator);
+}
+void MonopolyGame::StartGame() {
+
+	CurrentPlayer = 0;
 	//Reset and shuffle the decks
-	std::vector<std::string> chest = master_chest; //Community Chest
+	chest = master_chest; //Community Chest
 	std::random_shuffle(chest.begin(), chest.end()); //Shuffle the deck
-	std::vector<std::string> chance = master_chance; //Chance
+	chance = master_chance; //Chance
 	std::random_shuffle(chance.begin(), chance.end()); //Shuffle the deck
+	AmountInParking = 0;
+	AmountDead = 0;
+	rolls = 0;
 
+	//Blank out data
+	for (int p = 0; p < PlayerNum; p++){ players[p] = PlayerInfo(); }
+	
 	SetPlayerStats(players);
 
-	int AmountInParking = 0;
-	int AmountDead = 0;
-	int rolls = 0;
-
-	std::string Output = "";
-	std::string ADD;
-	//Game
-	while (rolls < (RollsPerGame*PlayerNum)) {
-		if (1 >= (PlayerNum - AmountDead)) { break; }
-
-		//Display the roll number.
-		if (Display) {
-			COORD xy = { (0 * x), y };
-			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), xy);
-			ADD = (std::to_string((int)ceil(rolls*0.25f))); padTo(ADD, 3); Output.append("[R:" + ADD + "] ");
-		}
-		
-		for (int p = 0; p < PlayerNum; p++) {
-			//if ((rolls % PlayerNum) == 0) { ADD = (std::to_string((int)ceil(rolls*0.25f))); padTo(ADD, 3); Output.append("[R:" + ADD + "] "); }
-			if (!players[p].isDead) {
-
-				if (Display) {
-					COORD xy = { (p * x), y };
-					SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), xy);
-					if (p == PlayerNum - 1) { y += 1; }
-					else if (players[PlayerNum - 1].isDead) {
-						if (p == PlayerNum - 2) { y += 1; }
-						else if (players[PlayerNum - 2].isDead) {
-							if (p == PlayerNum - 3) { y += 1; }
-						}
-					}
-				}
-
-				ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
-
-
-				players[p].OldPosition = players[p].position;
-				//Get a random dice roll
-				int DiceRoll = (int)std::floor(36 * distribution(mt));
-
-				ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-				Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
-				ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
-
-
-				bool IsDouble = false;
-				//Checks for a double
-				for (int i = 0; i < 6; i++) { if (DiceRoll == DoubleIndex[i]) { IsDouble = true; } }
-
-				//Rolls a double to get out of Jail
-				if (IsDouble && players[p].InJail > 0) {
-					players[p].InJail = 0;
-					players[p].position = 10;
-					ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-					ADD = "Out of Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
-				}
-				//Add one to the Doubles Counter
-				else if (IsDouble) { players[p].Doubles += 1; }
-				//Reset doubles
-				else { players[p].Doubles = 0; }
-
-				//If in jail do nothing
-				if (players[p].InJail > 1) {
-					players[p].InJail -= 1;
-					ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-					ADD = StreetNames[players[p].position]; padTo(ADD, 24); Output.append("[" + ADD + "] ");
-					players[p].Squares[players[p].position] += 1;
-					players[p].TotalLocationsLandedOn += 1;
-					//Need something for paying to get out of jail
-					//Check if player wants to leave by paying JailFee
-					//Check if AI wants to leave by paying JailFee
-				}
-				//If the amount of doubles in a row is equal to or greater then 3, go to jail
-				else if (players[p].Doubles >= 3) {
-					players[p].position = 40; //Jail
-					if (players[p].JailPass == 0) {
-						players[p].InJail = 3;
-						ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-						ADD = "3 Doubles: Go to Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
-						players[p].Squares[players[p].position] -= 1;
-						players[p].TotalLocationsLandedOn -= 1;
-					}
-					else {
-						players[p].position = 10; //Just Visiting Jail
-						players[p].JailPass -= 1;
-						ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-						ADD = "3 Doubles: Go to Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
-						Output.append("[Free Pass] ");
-						players[p].Squares[players[p].position] -= 1;
-						players[p].TotalLocationsLandedOn -= 1;
-					}
-					players[p].Doubles = 0; //Reset doubles
-				}
-				//Continue
-				else {
-
-					//If it is the players last day in jail
-					if (players[p].InJail == 1) {
-						players[p].InJail -= 1;
-						//No longer in Jail so set position to 10
-						players[p].position = 10;
-						players[p].Money -= JailFee;
-
-						ADD = "Free"; Output.append("[" + ADD + "] ");
-					}
-					//Roll the dice
-					players[p].position = ((players[p].position + rollvalues[DiceRoll]) % 40);
-					ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-					ADD = StreetNames[players[p].position]; padTo(ADD, 24); Output.append("[" + ADD + "] ");
-
-					//Calculate Rent payment
-					CalculateRentPayment(Data_Info, players, p, rollvalues[DiceRoll], Output);
-					//Calculate if the player should buy the land
-					CalculateLandPayment(Data_Info, players, p, Output);
-
-					int OldRentPosition = players[p].position;
-
-					std::string card = "-1";
-					//Chance
-					if (players[p].position == 7 || players[p].position == 22 || players[p].position == 36) {
-						card = chance[0]; //Get the value of the card on the top of the deck
-						chance.erase(chance.begin()); //Remove the card from the deck
-													  //If there is not more cards, reset the deck and shuffle
-						if (chance.size() == 0) {
-							chance = master_chance; //Reset the deck
-							std::random_shuffle(chance.begin(), chance.end()); //Shuffle the deck
-						}
-					}
-					//Community Chest
-					if (players[p].position == 2 || players[p].position == 17 || players[p].position == 33) {
-						card = chest[0]; //Get the value of the card on the top of the deck
-						chest.erase(chest.begin()); //Remove the card from the deck
-						if (chest.size() == 0) { //If there is not more cards, reset the deck and shuffle
-							chest = master_chest; //Reset the deck
-							std::random_shuffle(chest.begin(), chest.end()); //Shuffle the deck
-						}
-					}
-					CalculateCard(players, p, card, AmountInParking, Output);
-
-					//Go to jail
-					if (players[p].position == 30) {
-						players[p].position = 40; //Jail
-						if (players[p].JailPass == 0) { players[p].InJail = 3; }
-						else {
-							players[p].position = 10; //Just Visiting Jail
-							players[p].JailPass -= 1;
-							Output.append("[Free Pass] ");
-						}
-						players[p].Doubles = 0; //Reset doubles
-						//Add a point to the (Go to Jail) Location you landed on
-						players[p].Squares[30] += 1;
-						players[p].TotalLocationsLandedOn += 1;
-					}
-					//Income Tax
-					else if (players[p].position == 4) {
-						if (200 < (int)(players[p].TotalAssetValue*0.1)) {
-							players[p].Money -= 200;
-							Output.append("[-$200] ");
-							AmountInParking += 200;
-						}
-						else {
-							int temp = (int)(players[p].TotalAssetValue*0.1);
-							players[p].Money -= temp;
-							Output.append("[-$" + std::to_string(temp) + "] ");
-							AmountInParking += temp;
-						}
-					}
-					//Luxury Tax
-					else if (players[p].position == 38) {
-						players[p].Money -= 75;
-						Output.append("[-$75] ");
-						AmountInParking += 75;
-					}
-					//Free Parking
-					else if (FreeParkingRule && players[p].position == 20) {
-						players[p].Money += AmountInParking;
-						Output.append("[$" + std::to_string(AmountInParking) + "] ");
-						AmountInParking = 0;
-					}
-					//Recalculate Rent payment or If the player should buy the land
-					if (OldRentPosition != players[p].position && players[p].position != 40) {
-						CalculateRentPayment(Data_Info, players, p, rollvalues[DiceRoll], Output);
-						CalculateLandPayment(Data_Info, players, p, Output);
-					}
-
-				}
-
-				//Check if Player passed Go
-				if (players[p].position < players[p].OldPosition && players[p].position != 10 && players[p].position != 40 && players[p].OldPosition != 10 && players[p].OldPosition != 40) {
-					players[p].Money += 200;
-					players[p].TimesAroundBoard += 1;
-					Output.append("[Passed GO] ");
-				}
-
-				//End Position (not including jail)
-				if (players[p].position >= 0 && players[p].position < 40) {
-					players[p].Squares[players[p].position] += 1;
-					players[p].TotalLocationsLandedOn += 1;
-				}
-
-				//Player is Dead
-				int PlayerState = IsDead(players, p, Output);
-				if (PlayerState == 2) {
-					//Lost
-					Data_Info.Players[p].Place.push_back(PlayerNum - AmountDead);
-					players[p].isDead = true;
-					players[p].DiedAt = (rolls / PlayerNum);
-					AmountDead += 1;
-					for (int l = 0; l < 40; l++) {
-						if (Data_Info.LandOwnerShip[l] == p) { Data_Info.LandOwnerShip[l] = -1; }
-					}
-
-					Output.append("[Died at roll: " + std::to_string((rolls / PlayerNum)) + "]");
-				}
-				else if (PlayerState == 1) {
-					//Sold stuff to stay alive, so do nothing
-				}
-				else if (PlayerState == 0) {
-					if (TradePastRound < (rolls / PlayerNum)) { Trade(Data_Info, players, p, Output); }
-					if (UpgradePastRound < (rolls / PlayerNum)) { UpgradeTownship(players, p, Output); }
-					if (UnMortgagePastRound < (rolls / PlayerNum)) { UnMortgageProperty(players, p, Output); }
-				}
-
-
-				//What will this do?
-				feedForwardAI(players, p);
-				ResultValues;
-				//if (Display) { ColourString(Output); }
-			}
-			
-			if (Display) { ColourString(Output); }
-			if (DisplaySpecificRounds) { StuffAndThings.push_back(Output); }
-			rolls += 1;
-			Output = "";
-		}
-	}
+	Output = "";
+}
+void MonopolyGame::EndGame() {
 
 
 	CalculateAmountOfHouses(players);
@@ -951,37 +777,232 @@ bool Monopoly(PlayerInfo players[]) {
 		else { backPropagationAI(players, i, false); }
 
 	}
-
-
-	return true;
 }
+void MonopolyGame::Move() {
 
-void PlayGameInCMD() {
-	//Get the CMD window
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	Output = "";
 
-	PlayerInfo players[PlayerNum];
-	Net blank(topology);
-	for (int i = 0; i < PlayerNum; i++) {
-		Data_Player Temp;
-		Data_Info.Players.push_back(Temp);
-		network[i] = blank;
+	int p = CurrentPlayer;
+	if (!players[p].isDead) {
+
+		if (Display) {
+			COORD xy = { (p * x), y };
+			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), xy);
+			if (p == PlayerNum - 1) { y += 1; }
+			else if (players[PlayerNum - 1].isDead) {
+				if (p == PlayerNum - 2) { y += 1; }
+				else if (players[PlayerNum - 2].isDead) {
+					if (p == PlayerNum - 3) { y += 1; }
+				}
+			}
+		}
+
+		ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
+
+
+		players[p].OldPosition = players[p].position;
+		//Get a random dice roll
+		int DiceRoll = RollDice();
+
+		ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+		Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
+		ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
+
+
+		bool IsDouble = false;
+		//Checks for a double
+		for (int i = 0; i < 6; i++) { if (DiceRoll == DoubleIndex[i]) { IsDouble = true; } }
+
+		//Rolls a double to get out of Jail
+		if (IsDouble && players[p].InJail > 0) {
+			players[p].InJail = 0;
+			players[p].position = 10;
+			ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+			ADD = "Out of Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+		}
+		//Add one to the Doubles Counter
+		else if (IsDouble) { players[p].Doubles += 1; }
+		//Reset doubles
+		else { players[p].Doubles = 0; }
+
+		//If in jail do nothing
+		if (players[p].InJail > 1) {
+			players[p].InJail -= 1;
+			ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+			ADD = StreetNames[players[p].position]; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+			players[p].Squares[players[p].position] += 1;
+			players[p].TotalLocationsLandedOn += 1;
+			//Need something for paying to get out of jail
+			//Check if player wants to leave by paying JailFee
+			//Check if AI wants to leave by paying JailFee
+		}
+		//If the amount of doubles in a row is equal to or greater then 3, go to jail
+		else if (players[p].Doubles >= 3) {
+			players[p].position = 40; //Jail
+			if (players[p].JailPass == 0) {
+				players[p].InJail = 3;
+				ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+				ADD = "3 Doubles: Go to Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+				players[p].Squares[players[p].position] -= 1;
+				players[p].TotalLocationsLandedOn -= 1;
+			}
+			else {
+				players[p].position = 10; //Just Visiting Jail
+				players[p].JailPass -= 1;
+				ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+				ADD = "3 Doubles: Go to Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+				Output.append("[Free Pass] ");
+				players[p].Squares[players[p].position] -= 1;
+				players[p].TotalLocationsLandedOn -= 1;
+			}
+			players[p].Doubles = 0; //Reset doubles
+		}
+		//Continue
+		else {
+
+			//If it is the players last day in jail
+			if (players[p].InJail == 1) {
+				players[p].InJail -= 1;
+				//No longer in Jail so set position to 10
+				players[p].position = 10;
+				players[p].Money -= JailFee;
+
+				ADD = "Free"; Output.append("[" + ADD + "] ");
+			}
+			//Roll the dice
+			players[p].position = ((players[p].position + rollvalues[DiceRoll]) % 40);
+			ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+			ADD = StreetNames[players[p].position]; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+
+			//Calculate Rent payment
+			CalculateRentPayment(Data_Info, players, p, rollvalues[DiceRoll], Output);
+			//Calculate if the player should buy the land
+			CalculateLandPayment(Data_Info, players, p, Output);
+
+			int OldRentPosition = players[p].position;
+
+			std::string card = "-1";
+			//Chance
+			if (players[p].position == 7 || players[p].position == 22 || players[p].position == 36) {
+				card = chance[0]; //Get the value of the card on the top of the deck
+				chance.erase(chance.begin()); //Remove the card from the deck
+											  //If there is not more cards, reset the deck and shuffle
+				if (chance.size() == 0) {
+					chance = master_chance; //Reset the deck
+					std::random_shuffle(chance.begin(), chance.end()); //Shuffle the deck
+				}
+			}
+			//Community Chest
+			if (players[p].position == 2 || players[p].position == 17 || players[p].position == 33) {
+				card = chest[0]; //Get the value of the card on the top of the deck
+				chest.erase(chest.begin()); //Remove the card from the deck
+				if (chest.size() == 0) { //If there is not more cards, reset the deck and shuffle
+					chest = master_chest; //Reset the deck
+					std::random_shuffle(chest.begin(), chest.end()); //Shuffle the deck
+				}
+			}
+			CalculateCard(players, p, card, AmountInParking, Output);
+
+			//Go to jail
+			if (players[p].position == 30) {
+				players[p].position = 40; //Jail
+				if (players[p].JailPass == 0) { players[p].InJail = 3; }
+				else {
+					players[p].position = 10; //Just Visiting Jail
+					players[p].JailPass -= 1;
+					Output.append("[Free Pass] ");
+				}
+				players[p].Doubles = 0; //Reset doubles
+				//Add a point to the (Go to Jail) Location you landed on
+				players[p].Squares[30] += 1;
+				players[p].TotalLocationsLandedOn += 1;
+			}
+			//Income Tax
+			else if (players[p].position == 4) {
+				if (200 < (int)(players[p].TotalAssetValue*0.1)) {
+					players[p].Money -= 200;
+					Output.append("[-$200] ");
+					AmountInParking += 200;
+				}
+				else {
+					int temp = (int)(players[p].TotalAssetValue*0.1);
+					players[p].Money -= temp;
+					Output.append("[-$" + std::to_string(temp) + "] ");
+					AmountInParking += temp;
+				}
+			}
+			//Luxury Tax
+			else if (players[p].position == 38) {
+				players[p].Money -= 75;
+				Output.append("[-$75] ");
+				AmountInParking += 75;
+			}
+			//Free Parking
+			else if (FreeParkingRule && players[p].position == 20) {
+				players[p].Money += AmountInParking;
+				Output.append("[$" + std::to_string(AmountInParking) + "] ");
+				AmountInParking = 0;
+			}
+			//Recalculate Rent payment or If the player should buy the land
+			if (OldRentPosition != players[p].position && players[p].position != 40) {
+				CalculateRentPayment(Data_Info, players, p, rollvalues[DiceRoll], Output);
+				CalculateLandPayment(Data_Info, players, p, Output);
+			}
+
+		}
+
+		//Check if Player passed Go
+		if (players[p].position < players[p].OldPosition && players[p].position != 10 && players[p].position != 40 && players[p].OldPosition != 10 && players[p].OldPosition != 40) {
+			players[p].Money += 200;
+			players[p].TimesAroundBoard += 1;
+			Output.append("[Passed GO] ");
+		}
+
+		//End Position (not including jail)
+		if (players[p].position >= 0 && players[p].position < 40) {
+			players[p].Squares[players[p].position] += 1;
+			players[p].TotalLocationsLandedOn += 1;
+		}
+
+		//Player is Dead
+		int PlayerState = IsDead(players, p, Output);
+		if (PlayerState == 2) {
+			//Lost
+			Data_Info.Players[p].Place.push_back(PlayerNum - AmountDead);
+			players[p].isDead = true;
+			players[p].DiedAt = (rolls / PlayerNum);
+			AmountDead += 1;
+			for (int l = 0; l < 40; l++) {
+				if (Data_Info.LandOwnerShip[l] == p) { Data_Info.LandOwnerShip[l] = -1; }
+			}
+
+			Output.append("[Died at roll: " + std::to_string((rolls / PlayerNum)) + "]");
+		}
+		else if (PlayerState == 1) {
+			//Sold stuff to stay alive, so do nothing
+		}
+		else if (PlayerState == 0) {
+			if (TradePastRound < (rolls / PlayerNum)) { Trade(Data_Info, players, p, Output); }
+			if (UpgradePastRound < (rolls / PlayerNum)) { UpgradeTownship(players, p, Output); }
+			if (UnMortgagePastRound < (rolls / PlayerNum)) { UnMortgageProperty(players, p, Output); }
+		}
+
+
+		//What will this do?
+		feedForwardAI(players, p);
+		ResultValues;
+		//if (Display) { ColourString(Output); }
 	}
-	for (int i = 0; i < 41; i++) {
-		Data_Info.LandOwnerShip[i] = -1;
-	}
-	//Data_Info.LandOwnerShip = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1 }
-
-
 	
-	int games_Finished = 0;
-	while (games_Finished < Games) {
-		if (Monopoly(players)) { games_Finished += 1; }
-		if (Display) { DisplayStats(players, y); }
-	}
-	std::cout << std::endl << std::endl;
-	if (!Display) { GetData(); }
+	if (Display) { ColourString(Output); }
+	if (DisplaySpecificRounds) { StuffAndThings.push_back(Output); }
+	rolls += 1;
+
+	//Move to the next player
+	CurrentPlayer++;
+	if (CurrentPlayer % 4 == 0) { CurrentPlayer = 0; }
 }
+
 
 #pragma endregion
 
