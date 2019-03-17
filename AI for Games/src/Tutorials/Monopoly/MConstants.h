@@ -6,7 +6,7 @@
 #pragma region Variables
 
 //Used for CMD output
-const bool Display = false;
+const bool Display = true;
 const bool DisplaySpecificRounds = false;
 const int  SpecificRound = 600;
 

@@ -121,6 +121,7 @@ void ParseString(std::string& Output) {
 	}
 	ChangeColour(0);
 	std::cout << "|";
+	Output = "";
 }
 
 void UserInitialize() {
@@ -146,16 +147,31 @@ void UserUpdate() {
 	//Keep going until game games are done.
 
 	if (!game_NotInprogress) {
-		game.Move();
+
+		//A single players move
+		if (!game.players[game.CurrentPlayer].AI && !game.players[game.CurrentPlayer].isDead) {
+			game.PlayerMove();
+		}
+		else { game.AIMove(); }
+
+		
 		if (1 >= (PlayerNum - game.AmountDead)) {
 			game.EndGame();
 			games_Finished += 1;
-			if (games_Finished < Games) { game = MonopolyGame(); game.StartGame(); }
-			else { game_NotInprogress = true; games_Finished = 0; }
+			//There are more games to get through, so continue.
+			if (games_Finished < Games) { 
+				game = MonopolyGame();
+				game.StartGame(); 
+			}
+			//No games left, so stop.
+			else {
+				game_NotInprogress = true;
+				games_Finished = 0;
+				if (Display) { DisplayStats(game.players, y); }
+			}
 		}
-		std::cout << game.CurrentPlayer; ParseString(game.Output); std::cout << std::endl;
+		//std::cout << game.CurrentPlayer; ParseString(game.Output); std::cout << std::endl;
 	}
-	//if (Display) { DisplayStats(players, y); }
 	
 }
 
@@ -260,11 +276,15 @@ void Render() {
 }
 
 void GUI(){
-	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f);
+	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f); 
 	{
-		if (ImGui::Button("Button")) {}
-		if (ImGui::Button("Start Game")) { game = MonopolyGame(); game.StartGame(); game_NotInprogress = false; }
-		ImGui::Text("Text");
+		if (ImGui::Button("Start Game")) { game = MonopolyGame(); game.StartGame(); game.players[3].AI = false; game_NotInprogress = false; }
+		if (!game_NotInprogress) {
+			if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); }
+			if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
+			if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
+			ImGui::Text("Text");
+		}
 	}
 	ImGui::End();
 }

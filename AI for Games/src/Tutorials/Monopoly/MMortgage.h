@@ -4,7 +4,7 @@
 
 #pragma region Upgrade & Mortgage
 
-void CalculateAmountOfHouses(PlayerInfo players[]) {
+void CalculateAmountOfHouses(PlayerInfo(&players)[PlayerNum]) {
 	for (int p = 0; p < PlayerNum; p++) {
 		players[p].TotalAmountOfHouses = 0;
 		players[p].TotalAmountOfHotels = 0;
@@ -14,7 +14,7 @@ void CalculateAmountOfHouses(PlayerInfo players[]) {
 		}
 	}
 }
-void CalculateAmountOfHouses(PlayerInfo players[], int p) {
+void CalculateAmountOfHouses(PlayerInfo(&players)[PlayerNum], int p) {
 	players[p].TotalAmountOfHouses = 0;
 	players[p].TotalAmountOfHotels = 0;
 	for (unsigned int i = 0; i < 40; i++) {
@@ -22,7 +22,7 @@ void CalculateAmountOfHouses(PlayerInfo players[], int p) {
 		else if (players[p].Land[i] >= 6 && players[p].Land[i] <= 9) { players[p].TotalAmountOfHotels += (players[p].Land[i] - 5); }
 	}
 }
-void CalculateTotalAssetValue(PlayerInfo players[]) {
+void CalculateTotalAssetValue(PlayerInfo(&players)[PlayerNum]) {
 	//his includes: Total cash on hand, mortgage value of mortgaged properties, printed price of UnMortgaged properties, and printed prices of buildings owned.
 	for (int p = 0; p < PlayerNum; p++) {
 		int AssetValue = 0;
@@ -81,7 +81,7 @@ int GetTownshipFromProperty(int zone) {
 	else { return -1; }
 }
 
-void CheckIfTownship(Data &Data_Info, PlayerInfo players[], int p) {
+void CheckIfTownship(Data &Data_Info, PlayerInfo(&players)[PlayerNum], int p) {
 	if (p == Data_Info.LandOwnerShip[1] && p == Data_Info.LandOwnerShip[3]) { players[p].Townships[0] = 1; } //Brown
 	if (p == Data_Info.LandOwnerShip[6] && p == Data_Info.LandOwnerShip[8] && p == Data_Info.LandOwnerShip[9]) { players[p].Townships[1] = 1; } //Light Blue
 	if (p == Data_Info.LandOwnerShip[11] && p == Data_Info.LandOwnerShip[13] && p == Data_Info.LandOwnerShip[14]) { players[p].Townships[2] = 1; } //Pink
@@ -103,7 +103,7 @@ void CheckIfTownship(Data &Data_Info, PlayerInfo players[], int p) {
 	//if (p == Data_Info.LandOwnerShip[31] && p == Data_Info.LandOwnerShip[32] && p == Data_Info.LandOwnerShip[34]) { players[p].Townships.push_back(6); } //Green
 	//if (p == Data_Info.LandOwnerShip[37] && p == Data_Info.LandOwnerShip[39]) { players[p].Townships.push_back(7); } //Dark Blue
 }
-bool CanUpgradeTownship(PlayerInfo players[], int p, int zone) {
+bool CanUpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, int zone) {
 
 	double Multiplyer = 2;
 	if (zone == 0 && players[p].Money >= ((HousePrice[1] + HousePrice[3]) * Multiplyer)) { return true; } //Brown
@@ -116,7 +116,7 @@ bool CanUpgradeTownship(PlayerInfo players[], int p, int zone) {
 	else if (zone == 7 && players[p].Money >= ((HousePrice[37] + HousePrice[39]) * Multiplyer)) { return true; } //Dark Blue
 	else { return false; }
 }
-void UpgradeTownship(PlayerInfo players[], int p, std::string& Output) {
+void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 
 	if (players[p].Money <= 0) { return; }
 	int Max = 6; //Need to add cases where is goes passed 6 (passed one hotel)
@@ -235,7 +235,7 @@ void UpgradeTownship(PlayerInfo players[], int p, std::string& Output) {
 	//Human Decides
 	else {}
 }
-void CalculateLandPayment(Data& Data_Info, PlayerInfo players[], int p, std::string& Output) {
+void CalculateLandPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 
 	if (players[p].Money <= 0) { return; }
 
@@ -264,7 +264,7 @@ void CalculateLandPayment(Data& Data_Info, PlayerInfo players[], int p, std::str
 		else {}
 	}
 }
-void CalculateRentPayment(Data& Data_Info, PlayerInfo players[], int p, int dice, std::string& Output) {
+void CalculateRentPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, int dice, std::string& Output) {
 	int space = players[p].position;
 	int Owner = Data_Info.LandOwnerShip[space];
 
@@ -304,7 +304,7 @@ void CalculateRentPayment(Data& Data_Info, PlayerInfo players[], int p, int dice
 	}
 }
 
-void UnMortgageProperty(PlayerInfo players[], int p, std::string& Output) {
+void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 	if (players[p].Money <= 0) { return; }
 	if (players[p].AI) {
 		std::string ADD;
@@ -349,7 +349,7 @@ void UnMortgageProperty(PlayerInfo players[], int p, std::string& Output) {
 	//Human Decides
 	else {}
 }
-void MortgageProperty(PlayerInfo players[], int p, std::string& Output) {
+void MortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 	if (players[p].AI) {
 		std::string ADD;
 		//Mortgage [Property] not in a [Township]

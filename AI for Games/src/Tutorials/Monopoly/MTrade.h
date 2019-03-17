@@ -4,28 +4,28 @@
 
 #pragma region Trading
 
-bool MajorityPropertyHolderT(PlayerInfo players[], int p, int t) {
+bool MajorityPropertyHolderT(PlayerInfo(&players)[PlayerNum], int p, int t) {
 	//(player) has half of all [Properties] in that [Township]
 	if (players[p].PiT[t] >= ceil(PiT_Max[t] * 0.5)) { return true; }
 	else { return false; }
 }
-bool MajorityPropertyHolderL(PlayerInfo players[], int p, int l) {
+bool MajorityPropertyHolderL(PlayerInfo(&players)[PlayerNum], int p, int l) {
 	//(player) has half of all [Properties] in that [Township]
 	if (players[p].PiT[GetTownshipFromProperty(l)] >= ceil(PiT_Max[GetTownshipFromProperty(l)] * 0.5)) { return true; }
 	else { return false; }
 }
-bool MinorityPropertyHolderT(PlayerInfo players[], int p, int t) {
+bool MinorityPropertyHolderT(PlayerInfo(&players)[PlayerNum], int p, int t) {
 	//(player) has less then half of all [Properties] in that [Township]
 	if (players[p].PiT[t] < ceil(PiT_Max[t] * 0.5) && players[p].PiT[t] > 0) { return true; }
 	else { return false; }
 }
-bool MinorityPropertyHolderL(PlayerInfo players[], int p, int l) {
+bool MinorityPropertyHolderL(PlayerInfo(&players)[PlayerNum], int p, int l) {
 	//(player) has less then half of all [Properties] in that [Township]
 	if (players[p].PiT[GetTownshipFromProperty(l)] < ceil(PiT_Max[GetTownshipFromProperty(l)] * 0.5) && players[p].PiT[GetTownshipFromProperty(l)] > 0) { return true; }
 	else { return false; }
 }
 
-int PriceChart(PlayerInfo players[], int buyer, int seller, int l, bool Index[4]) {
+int PriceChart(PlayerInfo(&players)[PlayerNum], int buyer, int seller, int l, bool Index[4]) {
 	int value = 1;
 
 	//Player One could finish a [Township]
@@ -82,7 +82,7 @@ int PriceChart(PlayerInfo players[], int buyer, int seller, int l, bool Index[4]
 	*/
 }
 
-void Trade_Buy(Data& Data_Info, PlayerInfo players[], int buyer, int seller, int space, int price) {
+void Trade_Buy(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer, int seller, int space, int price) {
 
 	Data_Info.LandOwnerShip[space] = buyer; //Look up table, to see who owns what
 
@@ -99,7 +99,7 @@ void Trade_Buy(Data& Data_Info, PlayerInfo players[], int buyer, int seller, int
 	CalculateAmountOfHouses(players, seller);
 	CheckIfTownship(Data_Info, players, seller); //Checks if player has a group of all the same colours
 }
-void AIRequestTrade(Data& Data_Info, PlayerInfo players[], int buyer, int seller, int space, std::string& Output) {
+void AIRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer, int seller, int space, std::string& Output) {
 	if (players[seller].AI) {
 
 		//buyer, seller, player with the upper-hand
@@ -172,7 +172,10 @@ void AIRequestTrade(Data& Data_Info, PlayerInfo players[], int buyer, int seller
 	//AI trading with a human
 	else {}
 }
-void Trade(Data& Data_Info, PlayerInfo players[], int p, std::string& Output) {
+void PlayerRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], std::string& Output, int space1, int space2, int value1 = 0, int value2 = 0) {
+
+}
+void Trade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 
 	if (players[p].Money <= 0) { return; }
 
@@ -200,7 +203,7 @@ void Trade(Data& Data_Info, PlayerInfo players[], int p, std::string& Output) {
 
 }
 //Player p is trying to sell his properties to not Die
-void FindBuyer(Data& Data_Info, PlayerInfo players[], int p, std::string& Output) {
+void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
 
 	if (players[p].Money > 0) { return; }
 
