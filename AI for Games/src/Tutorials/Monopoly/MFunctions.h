@@ -6,6 +6,7 @@
 #include <algorithm>    // std::random_shuffle
 #include <random>		//random_device, sort, random_shuffle
 #include <functional>	//Bind
+#include <vector>		//
 
 #include "MMortgage.h"
 #include "MTrade.h"
@@ -20,90 +21,91 @@ int x = 120;
 std::vector<std::string> StuffAndThings;
 
 #pragma region Nerual Network
-//33 inputs, 10 outputs. 
-//std::vector<unsigned int> topology = { 34,22,11 };
-std::vector<unsigned int> topology = { 16,11,11 };
-//4 network, 1 for each player.
-Net network[4];
+//33 inputs, 11 outputs. 
+//15 inputs, 11 outputs.
+std::vector<unsigned int> topology = { 15,12,11 };
+//4 network, 1 for each player, plus a master.
+Net network[5];
 std::vector<double> InputValues;
 std::vector<double> ResultValues;
 std::vector<double> TargetValues;
-std::vector<double> Winning_TargetValues = { 1,1,1,1,1, 1,1,1,1,1 };
-std::vector<double> Losing_TargetValues = { 0,0,0,0,0, 0,0,0,0,0 };
+std::vector<double> Winning_TargetValues = { 0.5, 1,1,1,1,1, 1,1,1,1,1 };
+std::vector<double> Losing_TargetValues = { 0.5, 0,0,0,0,0, 0,0,0,0,0 };
 
 
-void feedForwardAI(PlayerInfo players[], int p) {
+void feedForwardAI(PlayerInfo(&players)[PlayerNum], int p) {
 	InputValues = {
-				(double)players[p].Money,
-				(double)players[p].TimesAroundBoard,
-				(double)players[p].TotalAmountOfHouses,
-				(double)players[p].TotalAmountOfHotels,
-				(double)players[p].TotalAssetValue,
-				(double)players[p].Made_iT[0],
-				(double)players[p].Made_iT[1],
-				(double)players[p].Made_iT[2],
-				(double)players[p].Made_iT[3],
-				(double)players[p].Made_iT[4],
-				(double)players[p].Made_iT[5],
-				(double)players[p].Made_iT[6],
-				(double)players[p].Made_iT[7],
-				(double)players[p].Made_iT[8],
-				(double)players[p].Made_iT[9]
+		(double)players[p].BuyingFrequency[2],
+		(double)players[p].TimesAroundBoard		*0.005,
+		(double)players[p].TotalAmountOfHouses	*0.02,
+		(double)players[p].TotalAmountOfHotels	*0.1,
+		(double)players[p].TotalAssetValue		*0.00002,
 
-				////Land Made: 28
-				////First Side: 6
-				//(double)players[p].Land_Made[1],
-				//(double)players[p].Land_Made[3],
-				//(double)players[p].Land_Made[5],//Second Half
-				//(double)players[p].Land_Made[6],
-				//(double)players[p].Land_Made[8],
-				//(double)players[p].Land_Made[9],
-				////Second Side: 8
-				//(double)players[p].Land_Made[11],
-				//(double)players[p].Land_Made[12],
-				//(double)players[p].Land_Made[13],
-				//(double)players[p].Land_Made[14],
-				//(double)players[p].Land_Made[15],//Second Half
-				//(double)players[p].Land_Made[16],
-				//(double)players[p].Land_Made[18],
-				//(double)players[p].Land_Made[19],
-				////Third Side: 8
-				//(double)players[p].Land_Made[21],
-				//(double)players[p].Land_Made[23],
-				//(double)players[p].Land_Made[24],
-				//(double)players[p].Land_Made[25],//Second Half
-				//(double)players[p].Land_Made[26],
-				//(double)players[p].Land_Made[27],
-				//(double)players[p].Land_Made[28],
-				//(double)players[p].Land_Made[29],
-				////Forth Side: 6
-				//(double)players[p].Land_Made[31],
-				//(double)players[p].Land_Made[32],
-				//(double)players[p].Land_Made[34],
-				//(double)players[p].Land_Made[35],//Second Half
-				//(double)players[p].Land_Made[37],
-				//(double)players[p].Land_Made[39]
+		(double)players[p].Made_iT[0],
+		(double)players[p].Made_iT[1],
+		(double)players[p].Made_iT[2],
+		(double)players[p].Made_iT[3],
+		(double)players[p].Made_iT[4],
+		(double)players[p].Made_iT[5],
+		(double)players[p].Made_iT[6],
+		(double)players[p].Made_iT[7],
+		(double)players[p].Made_iT[8],
+		(double)players[p].Made_iT[9]
+
+		////Land Made: 28
+		////First Side: 6
+		//(double)players[p].Land_Made[1],
+		//(double)players[p].Land_Made[3],
+		//(double)players[p].Land_Made[5],//Second Half
+		//(double)players[p].Land_Made[6],
+		//(double)players[p].Land_Made[8],
+		//(double)players[p].Land_Made[9],
+		////Second Side: 8
+		//(double)players[p].Land_Made[11],
+		//(double)players[p].Land_Made[12],
+		//(double)players[p].Land_Made[13],
+		//(double)players[p].Land_Made[14],
+		//(double)players[p].Land_Made[15],//Second Half
+		//(double)players[p].Land_Made[16],
+		//(double)players[p].Land_Made[18],
+		//(double)players[p].Land_Made[19],
+		////Third Side: 8
+		//(double)players[p].Land_Made[21],
+		//(double)players[p].Land_Made[23],
+		//(double)players[p].Land_Made[24],
+		//(double)players[p].Land_Made[25],//Second Half
+		//(double)players[p].Land_Made[26],
+		//(double)players[p].Land_Made[27],
+		//(double)players[p].Land_Made[28],
+		//(double)players[p].Land_Made[29],
+		////Forth Side: 6
+		//(double)players[p].Land_Made[31],
+		//(double)players[p].Land_Made[32],
+		//(double)players[p].Land_Made[34],
+		//(double)players[p].Land_Made[35],//Second Half
+		//(double)players[p].Land_Made[37],
+		//(double)players[p].Land_Made[39]
 	};
 	network[p].feedForward(InputValues);
 	network[p].getResults(ResultValues);
 }
 
-void backPropagationAI(PlayerInfo players[], int p, bool Good) {
+void backPropagationAI(PlayerInfo(&players)[PlayerNum], int p, bool Good) {
 	if (!Good) { network[p].backPropagation(Losing_TargetValues); }
 	else { network[p].backPropagation(Winning_TargetValues); }
-
 	//TargetValues = {
-	//	(double)players[i].Townships[0],
-	//	(double)players[i].Townships[1],
-	//	(double)players[i].Townships[2],
-	//	(double)players[i].Townships[3],
-	//	(double)players[i].Townships[4],
-	//	(double)players[i].Townships[5],
-	//	(double)players[i].Townships[6],
-	//	(double)players[i].Townships[7],
-	//	(double)players[i].Townships[8],
-	//	(double)players[i].Townships[9]
+	//	(double)players[p].Townships[0],
+	//	(double)players[p].Townships[1],
+	//	(double)players[p].Townships[2],
+	//	(double)players[p].Townships[3],
+	//	(double)players[p].Townships[4],
+	//	(double)players[p].Townships[5],
+	//	(double)players[p].Townships[6],
+	//	(double)players[p].Townships[7],
+	//	(double)players[p].Townships[8],
+	//	(double)players[p].Townships[9]
 	//};
+	//std::sort(TargetValues.begin(), TargetValues.end());
 	//network[p].backPropagation(TargetValues);
 }
 
@@ -696,6 +698,8 @@ void MonopolyGame::StartGame() {
 
 	Output = "";
 }
+
+int run = 0;
 void MonopolyGame::EndGame() {
 
 
@@ -731,8 +735,8 @@ void MonopolyGame::EndGame() {
 
 			//Feed the neural network with the winning player scores. 
 			//This will be sent twice.
-			feedForwardAI(players, p);
-			backPropagationAI(players, p, true);
+			//feedForwardAI(players, p);
+			//backPropagationAI(players, p, true);
 		}
 	}
 	StuffAndThings.clear();
@@ -742,7 +746,7 @@ void MonopolyGame::EndGame() {
 	for (int i = 0; i < PlayerNum; i++) {
 		if (players[i].DiedAt > highest) { highest = players[i].DiedAt; }
 	}
-
+	run++;
 	for (int i = 0; i < PlayerNum; i++) {
 		if (players[i].Money < 0) { Data_Info.Players[i].Money.push_back(0); }
 		else { Data_Info.Players[i].Money.push_back(players[i].Money); }
@@ -765,6 +769,9 @@ void MonopolyGame::EndGame() {
 			Data_Info.Players[i].Made_iT[j] += players[i].Made_iT[j];
 		}
 
+		players[i].BuyingFrequency[2] = (players[i].BuyingFrequency[0] / (players[i].BuyingFrequency[0] + players[i].BuyingFrequency[1]));
+		Losing_TargetValues[0] = players[i].BuyingFrequency[2];
+		Winning_TargetValues[0] = players[i].BuyingFrequency[2];
 
 		//Feed the neural network with all the players scores.
 		//If the player was in the top 2, expect best target values.
@@ -774,8 +781,16 @@ void MonopolyGame::EndGame() {
 		if (players[i].DiedAt == 0 || players[i].DiedAt == highest) { backPropagationAI(players, i, true); }
 		else { backPropagationAI(players, i, false); }
 
+		//network[4].feedForward(InputValues);
+		//network[4].backPropagation(FUCKINGSHIT_TargetValues);
+		//network[4].getResults(ResultValues);
+		
+		network[i].getResults(ResultValues);
+		std::cout << run  << ": "<< ResultValues[0] << ", " << ResultValues[1] << ", " << ResultValues[2] << ", " << ResultValues[3] << ", " << ResultValues[4] << std::endl;
 	}
+	//std::cout << " \n";
 }
+
 void MonopolyGame::AIMove() {
 
 	Output = "";
@@ -795,7 +810,7 @@ void MonopolyGame::AIMove() {
 			}
 		}
 
-		ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
+		//ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
 
 
 		players[p].OldPosition = players[p].position;
@@ -803,9 +818,9 @@ void MonopolyGame::AIMove() {
 		int DiceRoll = RollDice();
 		
 
-		ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-		Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
-		ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
+		//ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+		//Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
+		//ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
 
 
 		bool IsDouble = false;
@@ -816,8 +831,8 @@ void MonopolyGame::AIMove() {
 		if (IsDouble && players[p].InJail > 0) {
 			players[p].InJail = 0;
 			players[p].position = 10;
-			ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-			ADD = "Out of Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+			//ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+			//ADD = "Out of Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
 		}
 		//Add one to the Doubles Counter
 		else if (IsDouble) { players[p].Doubles += 1; }
@@ -988,8 +1003,7 @@ void MonopolyGame::AIMove() {
 
 
 		//What will this do?
-		feedForwardAI(players, p);
-		ResultValues;
+		//feedForwardAI(players, p); ResultValues;
 		//if (Display) { ColourString(Output); }
 	}
 	
@@ -1005,7 +1019,9 @@ void MonopolyGame::AIMove() {
 
 void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, int value3 = 0, int value4 = 0) {
 
+	if (players[CurrentPlayer].isDead) { return; }
 	int p = CurrentPlayer;
+
 	switch (action)
 	{
 	case Action::Waiting:
@@ -1232,8 +1248,7 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 			}
 
 			//AI stuff
-			feedForwardAI(players, p);
-			ResultValues;
+			//feedForwardAI(players, p); ResultValues;
 
 			//Display stuff
 			if (Display) { ColourString(Output); }
@@ -1250,6 +1265,8 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 		break;
 	}
 }
+
+
 
 
 #pragma endregion

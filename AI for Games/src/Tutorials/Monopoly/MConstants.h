@@ -6,7 +6,7 @@
 #pragma region Variables
 
 //Used for CMD output
-const bool Display = true;
+static bool Display = false;
 const bool DisplaySpecificRounds = false;
 const int  SpecificRound = 600;
 
@@ -16,7 +16,7 @@ const int UnMortgagePastRound = 5;
 const bool FreeParkingRule = true;
 const int JailFee = 50;
 const int RollsPerGame = 800; //Total rolls per game
-const int Games = 1; //Total amount of games
+const int Games = 20000; //Total amount of games
 const int PlayerNum = 4;
 //Names of all Streets in order
 const std::string StreetNames[] = {
@@ -91,6 +91,8 @@ struct PlayerInfo {
 	unsigned int JailPass = 0;	 //Amount of (get out of jail free) passes
 	int Money = 1500;			 //Amount of money a player has
 
+	double BuyingFrequency[3] = { 0,0,0.0 }; // 1:Times Bought, 2:Times Skipped, 3:Percent
+
 	//Data 
 	//Land the player owns and the stage it is at
 	std::vector<int> Land = { 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0 };
@@ -158,6 +160,12 @@ struct Data {
 #pragma endregion
 
 #pragma region Basic Functions
+
+float transferFunction(float x) {
+	//tanh - output range [-1...1]
+	return tanh(x);
+}
+
 void padTo(std::string &str, const size_t num, const char paddingChar = ' ') {
 	if (num > str.size()) { str.insert(0, num - str.size(), paddingChar); }
 }

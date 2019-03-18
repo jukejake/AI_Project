@@ -258,7 +258,10 @@ void CalculateLandPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int 
 				Data_Info.LandOwnerShip[space] = p; //Look up table, to see who owns what
 				CalculateAmountOfHouses(players, p);
 				CheckIfTownship(Data_Info, players, p); //Checks if player has a group of all the same colours
+
+				players[p].BuyingFrequency[0] += 1;
 			}
+			else { players[p].BuyingFrequency[1] += 1; }
 		}
 		//Human Decides
 		else {}
