@@ -45,6 +45,7 @@ GLuint XTexture, OTexture, BTexture, RTexture;
 #pragma region User
 int games_Finished = 0;
 bool game_NotInprogress = true;
+int PlayerNumber = 0;
 
 MonopolyGame game;
 
@@ -127,18 +128,26 @@ void ParseString(std::string& Output) {
 void UserInitialize() {
 	/* initialize random seed: */
 	srand(time(NULL));
-
+	Net blank0(topology);
+	Net blank1(topology);
+	Net blank2(topology);
+	Net blank3(topology);
+	Net blank4(topology);
+	network[0] = blank0;
+	network[1] = blank1;
+	network[2] = blank2;
+	network[3] = blank3;
+	network[4] = blank4;
+	//Add extra network
+	
 	//initialize Starting values
-	Net blank(topology);
 	for (int i = 0; i < PlayerNum; i++) {
 		Data_Player Temp;
 		Data_Info.Players.push_back(Temp);
-		network[i] = blank;
 	}
 	for (int i = 0; i < 41; i++) {
 		Data_Info.LandOwnerShip[i] = -1;
 	}
-
 	//Display at the end
 	//std::cout << std::endl << std::endl;
 	//if (!Display) { GetData(); }
@@ -147,15 +156,12 @@ void UserUpdate() {
 	//Keep going until game games are done.
 
 	if (!game_NotInprogress) {
-
 		//A single players move
-		if (!game.players[game.CurrentPlayer].AI && !game.players[game.CurrentPlayer].isDead) {
-			game.PlayerMove();
-		}
-		else { game.AIMove(); }
+		if (game.players[game.CurrentPlayer].AI) { game.AIMove(); }
+		else { game.PlayerMove(); }
 
 		
-		if (1 >= (PlayerNum - game.AmountDead)) {
+		if (2 > (PlayerNum - game.AmountDead)) {
 			game.EndGame();
 			games_Finished += 1;
 			//There are more games to get through, so continue.
@@ -278,31 +284,52 @@ void Render() {
 void GUI(){
 	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f); 
 	{
-		if (ImGui::Button("Start Game")) { game = MonopolyGame(); game.StartGame(); game.players[3].AI = false; game_NotInprogress = false; }
+
+		switch (game_NotInprogress) {
+		case true:
+			//game.players[3].AI = false;
+			if (ImGui::Button("Start Game: AI vs AI")) {
+				game_NotInprogress = false;
+				Display = false;
+				game = MonopolyGame(); 
+				game.StartGame(); 
+			}
 		
-		switch(game_NotInprogress) {
-			case false:
-				if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); }
-				if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
-				if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
-				ImGui::Text("Text");
-				break;
+			ImGui::SliderInt("Player Number", &PlayerNumber, 0, 3);
+			if (ImGui::Button("Start Game: Player vs AI")) {
+				game_NotInprogress = false;
+				Display = true;
+				game = MonopolyGame();
+				game.StartGame();
+				game.players[PlayerNumber].AI = false;
+			}
+			break;
 		}
 
 		switch (game.players[game.CurrentPlayer].AI) {
-			case false:
-				
-				if (game.players[game.CurrentPlayer].Money < ) { ImGui::Text("Not Enough Money To Purchase"); }
-				else{ if (ImGui::Button("Buy for $")) {}}
+		case false:
 
-				if(game.players[game.CurrentPlayer].Money < 0){ ImGui::Text("Not Enough Money To Upgrade"); }
-				else { if (ImGui::Button("Upgrade")) {} }
+			if (ImGui::Button("Stop Game")) {
+				game.EndGame();
+				game_NotInprogress = true;
+			}
 
-				if(ImGui::Button("Sell")){}
+			if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); }
+			if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
+			if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
+			ImGui::Text("Text");
 
-				if(ImGui::Button("Trade")){}
+			if (game.players[game.CurrentPlayer].Money < PropertyPrice[game.players[game.CurrentPlayer].position]) { ImGui::Text("Not Enough Money To Purchase"); }
+			else { if (ImGui::Button("Buy for $")) { game.PlayerMove(Action::Buying); } }
 
-				break;
+			if (game.players[game.CurrentPlayer].Money < 0) { ImGui::Text("Not Enough Money To Upgrade"); }
+			else { if (ImGui::Button("Upgrade")) { game.PlayerMove(Action::Upgrading); } }
+
+			if (ImGui::Button("Mortgage")) { game.PlayerMove(Action::Mortgaging); }
+
+			if (ImGui::Button("Trade")) { game.PlayerMove(Action::Trading); }
+
+			break;
 		}
 	}
 	ImGui::End();
