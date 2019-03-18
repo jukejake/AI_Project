@@ -23,34 +23,38 @@ std::vector<std::string> StuffAndThings;
 #pragma region Nerual Network
 //33 inputs, 11 outputs. 
 //15 inputs, 11 outputs.
-std::vector<unsigned int> topology = { 15,12,11 };
+std::vector<unsigned int> topology = { 13,12,11 };
 //4 network, 1 for each player, plus a master.
-Net network[5];
+//Net network[4];
+Net SingleNetwork;
 std::vector<double> InputValues;
 std::vector<double> ResultValues;
 std::vector<double> TargetValues;
 std::vector<double> Winning_TargetValues = { 0.5, 1,1,1,1,1, 1,1,1,1,1 };
-std::vector<double> Losing_TargetValues = { 0.5, 0,0,0,0,0, 0,0,0,0,0 };
+std::vector<double> Losing_TargetValues = { 0.5, -1,-1,-1,-1,-1, -1,-1,-1,-1,-1 }; //{ 0.5, 0,0,0,0,0, 0,0,0,0,0 };
 
 
 void feedForwardAI(PlayerInfo(&players)[PlayerNum], int p) {
+	int hightest = 1;
+	for (size_t i = 0; i < 10; i++) {
+		if (players[p].Made_iT[i] > hightest) { hightest = players[p].Made_iT[i]; }
+	}
+
 	InputValues = {
 		(double)players[p].BuyingFrequency[2],
-		(double)players[p].TimesAroundBoard		*0.005,
-		(double)players[p].TotalAmountOfHouses	*0.02,
-		(double)players[p].TotalAmountOfHotels	*0.1,
-		(double)players[p].TotalAssetValue		*0.00002,
+		(double)players[p].TimesAroundBoard	*0.002,
+		(double)players[p].TotalAssetValue*0.00002,
 
-		(double)players[p].Made_iT[0],
-		(double)players[p].Made_iT[1],
-		(double)players[p].Made_iT[2],
-		(double)players[p].Made_iT[3],
-		(double)players[p].Made_iT[4],
-		(double)players[p].Made_iT[5],
-		(double)players[p].Made_iT[6],
-		(double)players[p].Made_iT[7],
-		(double)players[p].Made_iT[8],
-		(double)players[p].Made_iT[9]
+		(double)players[p].Made_iT[0]/hightest,
+		(double)players[p].Made_iT[1]/hightest,
+		(double)players[p].Made_iT[2]/hightest,
+		(double)players[p].Made_iT[3]/hightest,
+		(double)players[p].Made_iT[4]/hightest,
+		(double)players[p].Made_iT[5]/hightest,
+		(double)players[p].Made_iT[6]/hightest,
+		(double)players[p].Made_iT[7]/hightest,
+		(double)players[p].Made_iT[8]/hightest,
+		(double)players[p].Made_iT[9]/hightest
 
 		////Land Made: 28
 		////First Side: 6
@@ -86,13 +90,21 @@ void feedForwardAI(PlayerInfo(&players)[PlayerNum], int p) {
 		//(double)players[p].Land_Made[37],
 		//(double)players[p].Land_Made[39]
 	};
-	network[p].feedForward(InputValues);
-	network[p].getResults(ResultValues);
+	//network[p].feedForward(InputValues);
+	//network[p].getResults(ResultValues);
+	SingleNetwork.feedForward(InputValues);
+	SingleNetwork.getResults(ResultValues);
 }
 
 void backPropagationAI(PlayerInfo(&players)[PlayerNum], int p, bool Good) {
-	if (!Good) { network[p].backPropagation(Losing_TargetValues); }
-	else { network[p].backPropagation(Winning_TargetValues); }
+	if (!Good) { 
+		SingleNetwork.backPropagation(Losing_TargetValues);
+		//network[p].backPropagation(Losing_TargetValues); 
+	}
+	else {
+		SingleNetwork.backPropagation(Winning_TargetValues);
+		//network[p].backPropagation(Winning_TargetValues);
+	}
 	//TargetValues = {
 	//	(double)players[p].Townships[0],
 	//	(double)players[p].Townships[1],
@@ -649,6 +661,7 @@ public:
 	void AIMove();
 	void PlayerMove(int action, int value1, int value2, int value3, int value4);
 	int RollDice();
+	void MonopolyShowMe(int p);
 
 	int AmountInParking;
 	int AmountDead;
@@ -661,7 +674,7 @@ private:
 	std::vector<std::string> chance;
 	std::default_random_engine generator;
 	int PlayerDiceRoll;
-	bool PlayerRolled;
+	bool PlayerRolled = false;
 };
 
 MonopolyGame::MonopolyGame() {
@@ -769,7 +782,7 @@ void MonopolyGame::EndGame() {
 			Data_Info.Players[i].Made_iT[j] += players[i].Made_iT[j];
 		}
 
-		players[i].BuyingFrequency[2] = (players[i].BuyingFrequency[0] / (players[i].BuyingFrequency[0] + players[i].BuyingFrequency[1]));
+		//players[i].BuyingFrequency[2] = (players[i].BuyingFrequency[0] / (players[i].BuyingFrequency[0] + players[i].BuyingFrequency[1]));
 		Losing_TargetValues[0] = players[i].BuyingFrequency[2];
 		Winning_TargetValues[0] = players[i].BuyingFrequency[2];
 
@@ -778,17 +791,32 @@ void MonopolyGame::EndGame() {
 		//If in the bottom 2, expect the worst target values.
 		feedForwardAI(players, i);
 		//The 2 last players did good.
-		if (players[i].DiedAt == 0 || players[i].DiedAt == highest) { backPropagationAI(players, i, true); }
-		else { backPropagationAI(players, i, false); }
+		if (players[i].DiedAt == 0 || players[i].DiedAt == highest) { backPropagationAI(players, i, true); TargetValues = Winning_TargetValues; }
+		else { backPropagationAI(players, i, false); TargetValues = Losing_TargetValues; }
 
 		//network[4].feedForward(InputValues);
 		//network[4].backPropagation(FUCKINGSHIT_TargetValues);
 		//network[4].getResults(ResultValues);
 		
-		network[i].getResults(ResultValues);
-		std::cout << run  << ": "<< ResultValues[0] << ", " << ResultValues[1] << ", " << ResultValues[2] << ", " << ResultValues[3] << ", " << ResultValues[4] << std::endl;
+		//network[i].getResults(ResultValues);
+		//SingleNetwork.getResults(ResultValues);
+		//std::cout << i << ":I: " << InputValues[0] << ", " << InputValues[1] << ", " << InputValues[2] << ", " << InputValues[3] << ", " << InputValues[4] << std::endl;
+		//std::cout << i << ":T: " << TargetValues[0] << ", " << TargetValues[1] << ", " << TargetValues[2] << ", " << TargetValues[3] << ", " << TargetValues[4] << std::endl;
+		//std::cout << i << ":R: " << ResultValues[0] << ", " << ResultValues[1] << ", " << ResultValues[2] << ", " << ResultValues[3] << ", " << ResultValues[4] << std::endl;
 	}
-	//std::cout << " \n";
+	std::cout << run << " \n";
+}
+
+void MonopolyGame::MonopolyShowMe(int p) {
+	feedForwardAI(players, p);
+	SingleNetwork.getResults(ResultValues);
+	std::cout << p << ":I: " << InputValues[0] << "| " << InputValues[1] << ", " << InputValues[2] << ", " 
+		<< InputValues[3] << ", " << InputValues[4] << ", " << InputValues[5] << ", " << InputValues[6] << ", " << InputValues[7] << ", "
+		<< InputValues[8] << ", "  << InputValues[9] << ", " << InputValues[10] << ", "<< InputValues[11] << ", "<< InputValues[12] << std::endl;
+
+	std::cout << p << ":R: " << ResultValues[0] << "| "  
+		<< ResultValues[1] << ", "  << ResultValues[2] << ", " << ResultValues[3] << ", " << ResultValues[4] << ", " << ResultValues[5] << ", "
+		<< ResultValues[6] << ", " << ResultValues[7] << ", " << ResultValues[8] << ", " << ResultValues[9] << ", " << ResultValues[10] << std::endl;
 }
 
 void MonopolyGame::AIMove() {
@@ -797,6 +825,8 @@ void MonopolyGame::AIMove() {
 	int p = CurrentPlayer;
 
 	if (!players[p].isDead) {
+		feedForwardAI(players, p);
+		SingleNetwork.getResults(ResultValues);
 
 		if (Display) {
 			COORD xy = { (p * x), y };
@@ -810,7 +840,7 @@ void MonopolyGame::AIMove() {
 			}
 		}
 
-		//ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
+		ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
 
 
 		players[p].OldPosition = players[p].position;
@@ -818,9 +848,9 @@ void MonopolyGame::AIMove() {
 		int DiceRoll = RollDice();
 		
 
-		//ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-		//Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
-		//ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
+		ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+		Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
+		ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
 
 
 		bool IsDouble = false;
@@ -831,8 +861,8 @@ void MonopolyGame::AIMove() {
 		if (IsDouble && players[p].InJail > 0) {
 			players[p].InJail = 0;
 			players[p].position = 10;
-			//ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-			//ADD = "Out of Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
+			ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
+			ADD = "Out of Jail"; padTo(ADD, 24); Output.append("[" + ADD + "] ");
 		}
 		//Add one to the Doubles Counter
 		else if (IsDouble) { players[p].Doubles += 1; }
@@ -891,7 +921,7 @@ void MonopolyGame::AIMove() {
 			//Calculate Rent payment
 			CalculateRentPayment(Data_Info, players, p, rollvalues[DiceRoll], Output);
 			//Calculate if the player should buy the land
-			CalculateLandPayment(Data_Info, players, p, Output);
+			CalculateLandPayment(Data_Info, players, p, Output, ResultValues);
 
 			int OldRentPosition = players[p].position;
 
@@ -960,7 +990,7 @@ void MonopolyGame::AIMove() {
 			//Recalculate Rent payment or If the player should buy the land
 			if (OldRentPosition != players[p].position && players[p].position != 40) {
 				CalculateRentPayment(Data_Info, players, p, rollvalues[DiceRoll], Output);
-				CalculateLandPayment(Data_Info, players, p, Output);
+				CalculateLandPayment(Data_Info, players, p, Output, ResultValues);
 			}
 
 		}
@@ -996,9 +1026,9 @@ void MonopolyGame::AIMove() {
 			//Sold stuff to stay alive, so do nothing
 		}
 		else if (PlayerState == 0) {
-			if (TradePastRound < (rolls / PlayerNum)) { Trade(Data_Info, players, p, Output); }
+			if (TradePastRound < (rolls / PlayerNum)) { Trade(Data_Info, players, p, Output, ResultValues); }
 			if (UpgradePastRound < (rolls / PlayerNum)) { UpgradeTownship(players, p, Output); }
-			if (UnMortgagePastRound < (rolls / PlayerNum)) { UnMortgageProperty(players, p, Output); }
+			if (UnMortgagePastRound < (rolls / PlayerNum)) { UnMortgageProperty(players, p, Output, ResultValues); }
 		}
 
 
@@ -1216,7 +1246,7 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 		}
 		break;
 	case Action::Buying:
-		CalculateLandPayment(Data_Info, players, p, Output);
+		CalculateLandPayment(Data_Info, players, p, Output, ResultValues);
 		break;
 	case Action::Upgrading:
 		UpgradeTownship(players, p, Output);
@@ -1225,7 +1255,7 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 		MortgageProperty(players, p, Output);
 		break;
 	case Action::UnMortgaging:
-		UnMortgageProperty(players, p, Output);
+		UnMortgageProperty(players, p, Output, ResultValues);
 		break;
 	case Action::Trading:
 		PlayerRequestTrade(Data_Info, players, Output, value1, value2, value3, value4);

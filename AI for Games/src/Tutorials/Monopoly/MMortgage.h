@@ -235,7 +235,14 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 	//Human Decides
 	else {}
 }
-void CalculateLandPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
+
+int CheckLandPrice(Data& Data_Info, int space) {
+	if (Data_Info.LandOwnerShip[space] == -1) {
+		return PropertyPrice[space];
+	}
+	return 0;
+}
+void CalculateLandPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance) {
 
 	if (players[p].Money <= 0) { return; }
 
@@ -246,8 +253,11 @@ void CalculateLandPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int 
 	if (Owner == -1 && PropertyPrice[space] > 0) {
 		bool isBuy = false;
 		if (players[p].AI) {
-			double Multiplyer = 2;
-			if (players[p].Money >= (PropertyPrice[space] * Multiplyer)) { isBuy = true; }
+
+			double Multiplyer = ((importance[GetTownshipFromProperty(space)+1]+1)/2.0)+1; //Was 2
+			
+			if (importance[GetTownshipFromProperty(space)+1] < 0) { Output.append("[Nope] "); }
+			else if (players[p].Money >= (PropertyPrice[space] * Multiplyer)) { isBuy = true; }
 
 			//If buying the Property
 			if (isBuy) {
@@ -262,9 +272,25 @@ void CalculateLandPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int 
 				players[p].BuyingFrequency[0] += 1;
 			}
 			else { players[p].BuyingFrequency[1] += 1; }
+
+			players[p].BuyingFrequency[2] = (players[p].BuyingFrequency[0] / (players[p].BuyingFrequency[0] + players[p].BuyingFrequency[1]));
 		}
 		//Human Decides
-		else {}
+		else {
+			if (players[p].Money >= (PropertyPrice[space])) {
+				Output.append("[Bought $" + std::to_string(PropertyPrice[space]) + "] ");
+				players[p].Money -= PropertyPrice[space];
+				players[p].Land[space] = 1; //Counts as owning it (no houses yet)
+				players[p].PiT[GetTownshipFromProperty(space)] += 1;
+				Data_Info.LandOwnerShip[space] = p; //Look up table, to see who owns what
+				CalculateAmountOfHouses(players, p);
+				CheckIfTownship(Data_Info, players, p); //Checks if player has a group of all the same colours
+
+				players[p].BuyingFrequency[0] += 1;
+			}
+			else { players[p].BuyingFrequency[1] += 1; }
+			players[p].BuyingFrequency[2] = (players[p].BuyingFrequency[0] / (players[p].BuyingFrequency[0] + players[p].BuyingFrequency[1]));
+		}
 	}
 }
 void CalculateRentPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, int dice, std::string& Output) {
@@ -307,7 +333,7 @@ void CalculateRentPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int 
 	}
 }
 
-void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
+void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance) {
 	if (players[p].Money <= 0) { return; }
 	if (players[p].AI) {
 		std::string ADD;
@@ -315,7 +341,7 @@ void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Out
 		//UnMortgage [Property] in a [Township]
 		for (int i = 0; i < 10; i++) {
 			//If (player) has [Township] (i)
-			if (players[p].Townships[i] == 1) {
+			if (players[p].Townships[i] == 1 && importance[i+1] > 0) {
 				std::vector<int> properties = GetPropertiesInTownship(i);
 				for (int j = 0; j < properties.size(); j++) {
 					int l = properties[j];
@@ -329,11 +355,12 @@ void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Out
 					}
 				}
 			}
+			//else { Output.append("[Nope] "); }
 		}
 		//UnMortgage [Property] not in a [Township]
 		for (int i = 0; i < 10; i++) {
 			//If (player) does not have [Township] (i)
-			if (players[p].Townships[i] == 0) {
+			if (players[p].Townships[i] == 0 && importance[i+1] > 0) {
 				std::vector<int> properties = GetPropertiesInTownship(i);
 				for (int j = 0; j < properties.size(); j++) {
 					int l = properties[j];
@@ -347,6 +374,7 @@ void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Out
 					}
 				}
 			}
+			//else { Output.append("[Nope] "); }
 		}
 	}
 	//Human Decides

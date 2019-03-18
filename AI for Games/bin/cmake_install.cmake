@@ -1,4 +1,4 @@
-# Install script for directory: C:/Github/AI_Project/AI for Games
+# Install script for directory: C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Github/AI_Project/AI for Games/bin/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/100581854/Documents/GitHub/AI_Project/AI for Games/bin/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

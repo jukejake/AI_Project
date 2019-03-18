@@ -8,7 +8,9 @@
 //Used for CMD output
 static bool Display = false;
 const bool DisplaySpecificRounds = false;
-const int  SpecificRound = 600;
+const int SpecificRound = 600;
+
+static bool Network_On = true;
 
 const int TradePastRound = 5;
 const int UpgradePastRound = 5;
@@ -16,7 +18,7 @@ const int UnMortgagePastRound = 5;
 const bool FreeParkingRule = true;
 const int JailFee = 50;
 const int RollsPerGame = 800; //Total rolls per game
-const int Games = 20000; //Total amount of games
+const int Games = 5000; //Total amount of games
 const int PlayerNum = 4;
 //Names of all Streets in order
 const std::string StreetNames[] = {

@@ -99,7 +99,7 @@ void Trade_Buy(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer, int 
 	CalculateAmountOfHouses(players, seller);
 	CheckIfTownship(Data_Info, players, seller); //Checks if player has a group of all the same colours
 }
-void AIRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer, int seller, int space, std::string& Output) {
+void AIRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer, int seller, int space, float import_val, std::string& Output) {
 	if (players[seller].AI) {
 
 		//buyer, seller, player with the upper-hand
@@ -148,7 +148,7 @@ void AIRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer,
 		else { Index[3] = false; }
 
 
-		int price = (int)(PriceChart(players, buyer, seller, space, Index)*0.25f*PropertyPrice[space]);
+		int price = (int)(PriceChart(players, buyer, seller, space, Index)*0.25f*PropertyPrice[space]* import_val);
 
 		//Charge Player One as much money as possible
 		if (players[buyer].Money > price) {
@@ -175,7 +175,7 @@ void AIRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer,
 void PlayerRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], std::string& Output, int space1, int space2, int value1 = 0, int value2 = 0) {
 
 }
-void Trade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
+void Trade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance) {
 
 	if (players[p].Money <= 0) { return; }
 
@@ -186,11 +186,15 @@ void Trade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string&
 		else if (players[p].PiT[i] == 0) {}
 		//(player) has half of all [Properties] in that [Township]
 		else if (MajorityPropertyHolderT(players, p, i)) {
+
+			//i
+			float Import_Val = ((importance[i+1] + 1) / 2.0f) + 1;
+
 			std::vector<int> properties = GetPropertiesInTownship(i);
 			for (int l = 0; l < properties.size(); l++) {
 				//Check to see if someone owns the missing property; Try to buy it
 				int Owner = Data_Info.LandOwnerShip[properties[l]];
-				if (p != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, p, Owner, properties[l], Output); }
+				if (p != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, p, Owner, properties[l], Import_Val, Output); }
 			}
 		}
 		//(player) has less then half of all [Properties] in that [Township]
@@ -203,7 +207,7 @@ void Trade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string&
 
 }
 //Player p is trying to sell his properties to not Die
-void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
+void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance) {
 
 	if (players[p].Money > 0) { return; }
 
@@ -217,11 +221,14 @@ void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::str
 					if (players[pp].PiT[i] == PiT_Max[i]) {}
 					//(player two) has half of all [Properties] in that [Township]
 					else if (MajorityPropertyHolderT(players, pp, i)) {
+
+						float Import_Val = ((importance[i+1] + 1) / 2.0f) + 1;
+
 						std::vector<int> properties = GetPropertiesInTownship(i);
 						for (int l = 0; l < properties.size(); l++) {
 							//Check to see if (player one) owns the missing property; Try to buy it
 							int Owner = Data_Info.LandOwnerShip[properties[l]];
-							if (p == Owner && pp != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Output); }
+							if (p == Owner && pp != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Import_Val, Output); }
 							if (players[p].Money > 0) { return; }
 						}
 					}
@@ -236,11 +243,14 @@ void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::str
 					if (players[pp].PiT[i] == PiT_Max[i]) {}
 					//(player two) has less then half of all [Properties] in that [Township]
 					else if (MinorityPropertyHolderT(players, pp, i)) {
+
+						float Import_Val = ((importance[i+1] + 1) / 2.0f) + 1;
+
 						std::vector<int> properties = GetPropertiesInTownship(i);
 						for (int l = 0; l < properties.size(); l++) {
 							//Check to see if (player one) owns the missing property; Try to buy it
 							int Owner = Data_Info.LandOwnerShip[properties[l]];
-							if (p == Owner && pp != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Output); }
+							if (p == Owner && pp != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Import_Val, Output); }
 							if (players[p].Money > 0) { return; }
 						}
 					}
@@ -255,10 +265,13 @@ void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::str
 					if (players[pp].PiT[i] == PiT_Max[i]) {}
 					//(player one) has a full [Township]
 					else if (players[p].PiT[i] == PiT_Max[i]) {
+
+						float Import_Val = ((importance[i+1] + 1) / 2.0f) + 1;
+
 						std::vector<int> properties = GetPropertiesInTownship(i);
 						for (int l = 0; l < properties.size(); l++) {
 							//Try to buy the [Properties]
-							if (pp != p && p != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Output); }
+							if (pp != p && p != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Import_Val, Output); }
 							if (players[p].Money > 0) { return; }
 						}
 					}
@@ -273,11 +286,14 @@ void FindBuyer(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::str
 					if (players[pp].PiT[i] == PiT_Max[i]) {}
 					//(player two) has no [Properties] in that [Township]
 					else if (players[pp].PiT[i] == 0) {
+
+						float Import_Val = ((importance[i+1] + 1) / 2.0f) + 1;
+
 						std::vector<int> properties = GetPropertiesInTownship(i);
 						for (int l = 0; l < properties.size(); l++) {
 							//Check to see if (player one) owns the missing property; Try to buy it
 							int Owner = Data_Info.LandOwnerShip[properties[l]];
-							if (p == Owner && pp != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Output); }
+							if (p == Owner && pp != Owner && Owner != -1) { AIRequestTrade(Data_Info, players, pp, p, properties[l], Import_Val, Output); }
 							if (players[p].Money > 0) { return; }
 						}
 					}

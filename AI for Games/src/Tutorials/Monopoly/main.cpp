@@ -41,11 +41,13 @@ glm::mat4 projectionMatrix;
 // Textures
 GLuint XTexture, OTexture, BTexture, RTexture;
 
-
 #pragma region User
 int games_Finished = 0;
-bool game_NotInprogress = true;
 int PlayerNumber = 0;
+int UI_State = 0;
+bool game_Inprogress = false;
+int UserMoney = 0;
+int UserPosition = 0;
 
 MonopolyGame game;
 
@@ -128,17 +130,17 @@ void ParseString(std::string& Output) {
 void UserInitialize() {
 	/* initialize random seed: */
 	srand(time(NULL));
-	Net blank0(topology);
-	Net blank1(topology);
-	Net blank2(topology);
-	Net blank3(topology);
+	//Net blank0(topology);
+	//Net blank1(topology);
+	//Net blank2(topology);
+	//Net blank3(topology);
+	//network[0] = blank0;
+	//network[1] = blank1;
+	//network[2] = blank2;
+	//network[3] = blank3;
+	
 	Net blank4(topology);
-	network[0] = blank0;
-	network[1] = blank1;
-	network[2] = blank2;
-	network[3] = blank3;
-	network[4] = blank4;
-	//Add extra network
+	SingleNetwork = blank4;
 	
 	//initialize Starting values
 	for (int i = 0; i < PlayerNum; i++) {
@@ -155,13 +157,16 @@ void UserInitialize() {
 void UserUpdate() {
 	//Keep going until game games are done.
 
-	if (!game_NotInprogress) {
+	if (game_Inprogress) {
 		//A single players move
-		if (game.players[game.CurrentPlayer].AI) { game.AIMove(); }
+		if (game.players[game.CurrentPlayer].AI) { 
+			game.AIMove();
+			if (run > 400) { game.MonopolyShowMe(game.CurrentPlayer); }
+		}
 		else { game.PlayerMove(); }
 
 		
-		if (2 > (PlayerNum - game.AmountDead)) {
+		if (2 > (PlayerNum - game.AmountDead) || game.rolls >= RollsPerGame) {
 			game.EndGame();
 			games_Finished += 1;
 			//There are more games to get through, so continue.
@@ -171,8 +176,9 @@ void UserUpdate() {
 			}
 			//No games left, so stop.
 			else {
-				game_NotInprogress = true;
+				game_Inprogress = false;
 				games_Finished = 0;
+				UI_State = 0;
 				if (Display) { DisplayStats(game.players, y); }
 			}
 		}
@@ -284,52 +290,86 @@ void Render() {
 void GUI(){
 	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f); 
 	{
-
-		switch (game_NotInprogress) {
-		case true:
+		switch (UI_State) {
+			//Starting UI
+		case 0: {
 			//game.players[3].AI = false;
 			if (ImGui::Button("Start Game: AI vs AI")) {
-				game_NotInprogress = false;
-				Display = false;
-				game = MonopolyGame(); 
-				game.StartGame(); 
+				game_Inprogress = true;
+				//Display = false;
+				game = MonopolyGame();
+				game.StartGame();
+				UI_State = 1;
 			}
-		
 			ImGui::SliderInt("Player Number", &PlayerNumber, 0, 3);
 			if (ImGui::Button("Start Game: Player vs AI")) {
-				game_NotInprogress = false;
+				game_Inprogress = true;
 				Display = true;
 				game = MonopolyGame();
 				game.StartGame();
 				game.players[PlayerNumber].AI = false;
+				UI_State = 2;
 			}
-			break;
-		}
-
-		switch (game.players[game.CurrentPlayer].AI) {
-		case false:
-
-			if (ImGui::Button("Stop Game")) {
+		} break;
+			//AI vs AI
+		case 1: {
+			if (ImGui::Button("Stop running games")) {
 				game.EndGame();
-				game_NotInprogress = true;
+				game_Inprogress = false;
+				UI_State = 0;
 			}
+			if (ImGui::Button("End current game and start a new one")) {
+				game.EndGame();
+				game = MonopolyGame();
+				game.StartGame();
+			}
+		} break;
+			//Player vs AI
+		case 2: {
+			//If UI f* off.
+			//if (game.players[game.CurrentPlayer].AI) { return; }
 
-			if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); }
-			if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
 			if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
-			ImGui::Text("Text");
+			if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); } ImGui::SameLine();
+			if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
 
-			if (game.players[game.CurrentPlayer].Money < PropertyPrice[game.players[game.CurrentPlayer].position]) { ImGui::Text("Not Enough Money To Purchase"); }
-			else { if (ImGui::Button("Buy for $")) { game.PlayerMove(Action::Buying); } }
+			UserMoney = game.players[game.CurrentPlayer].Money;
+			UserPosition = game.players[game.CurrentPlayer].position;
 
-			if (game.players[game.CurrentPlayer].Money < 0) { ImGui::Text("Not Enough Money To Upgrade"); }
+			ImGui::Text("============================");
+			ImGui::Text("Current Position: %i", UserPosition);
+			ImGui::Text("Current Funds: $ %i", UserMoney);
+
+			if (CheckLandPrice(Data_Info, UserPosition) != 0) {
+				if (UserMoney < PropertyPrice[UserPosition]) { ImGui::Text("Not Enough Money To Purchase Property"); }
+				else {
+					ImGui::Text("Property Cost: $%i", PropertyPrice[UserPosition]); ImGui::SameLine();
+					if (ImGui::Button("Buy Property")) { game.PlayerMove(Action::Buying); }
+				}
+			}
+			else { ImGui::Text("Can't buy current Property"); }
+			
+
+			if (UserMoney < 0) { ImGui::Text("Not Enough Money To Upgrade"); }
 			else { if (ImGui::Button("Upgrade")) { game.PlayerMove(Action::Upgrading); } }
 
 			if (ImGui::Button("Mortgage")) { game.PlayerMove(Action::Mortgaging); }
 
 			if (ImGui::Button("Trade")) { game.PlayerMove(Action::Trading); }
 
-			break;
+			if (ImGui::Button("Exit")) {
+				game.EndGame();
+				game_Inprogress = false;
+				game.players[PlayerNumber].AI = true;
+				UI_State = 0;
+			}
+		} break;
+		case 3: {} break;
+		case 4: {} break;
+		case 5: {} break;
+		case 6: {} break;
+		case 7: {} break;
+
 		}
 	}
 	ImGui::End();
