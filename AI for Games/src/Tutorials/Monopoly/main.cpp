@@ -279,11 +279,30 @@ void GUI(){
 	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f); 
 	{
 		if (ImGui::Button("Start Game")) { game = MonopolyGame(); game.StartGame(); game.players[3].AI = false; game_NotInprogress = false; }
-		if (!game_NotInprogress) {
-			if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); }
-			if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
-			if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
-			ImGui::Text("Text");
+		
+		switch(game_NotInprogress) {
+			case false:
+				if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); }
+				if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
+				if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
+				ImGui::Text("Text");
+				break;
+		}
+
+		switch (game.players[game.CurrentPlayer].AI) {
+			case false:
+				
+				if (game.players[game.CurrentPlayer].Money < ) { ImGui::Text("Not Enough Money To Purchase"); }
+				else{ if (ImGui::Button("Buy for $")) {}}
+
+				if(game.players[game.CurrentPlayer].Money < 0){ ImGui::Text("Not Enough Money To Upgrade"); }
+				else { if (ImGui::Button("Upgrade")) {} }
+
+				if(ImGui::Button("Sell")){}
+
+				if(ImGui::Button("Trade")){}
+
+				break;
 		}
 	}
 	ImGui::End();
