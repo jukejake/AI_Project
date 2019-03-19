@@ -22,8 +22,8 @@
 /*---------------------------- Variables ----------------------------*/
 // GLFW window
 GLFWwindow* window;
-int width = 720; //1280
-int height = 720; //720
+int width = 900;
+int height = 900;
 
 // Uniform locations
 GLuint mvp_loc, col_loc;
@@ -39,7 +39,14 @@ glm::mat4 viewMatrix;
 glm::mat4 projectionMatrix;
 
 // Textures
-GLuint XTexture, OTexture, BTexture, RTexture;
+GLuint XTexture, OTexture, BTexture, RTexture, monopolyBoard;
+GLuint playerXTurn[4];	//	textures for the turn prompts
+GLuint pawnIcons[4], houseIcons[4];
+
+const float boardSize = 720.0f, pawnIconSize = 30.0f, shiftDistance = 58.0f;
+const glm::vec2 turnPromptSize = glm::vec2(300, 150);
+glm::vec2 spacePos[4][40];	//	coordinates of the center of each space 
+float deltaTime, timerVar = 0.0f;
 
 #pragma region User
 int games_Finished = 0;
@@ -199,6 +206,15 @@ void UserUpdate() {
 // Functions
 void DrawQuad(glm::vec2, glm::vec2, float = 0, glm::vec3 = glm::vec3(1.0f));
 
+bool timer(float timeToWait) {
+	timerVar += deltaTime;
+
+	if (timerVar < timeToWait) { return false; }	//	return false to denote that the timer hasn't reached its goal yet
+
+	timerVar = 0.0f;	//	reset
+	return true;
+}
+
 void Initialize()
 {
 	// Create a shader for the lab
@@ -208,31 +224,122 @@ void Initialize()
 	dumpProgram(shader_program, "Pong shader program");
 
 	{
-	XTexture = SOIL_load_OGL_texture(
-		ASSETS"Images/X.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-	);
-	OTexture = SOIL_load_OGL_texture(
-		ASSETS"Images/O.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-	);
-	BTexture = SOIL_load_OGL_texture(
-		ASSETS"Images/Black.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-	);
+		XTexture = SOIL_load_OGL_texture(
+			ASSETS"Images/X.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+		OTexture = SOIL_load_OGL_texture(
+			ASSETS"Images/O.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+		BTexture = SOIL_load_OGL_texture(
+			ASSETS"Images/Black.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
 
-	RTexture = SOIL_load_OGL_texture(
-		ASSETS"Images/Red.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-	);
+		RTexture = SOIL_load_OGL_texture(
+			ASSETS"Images/Red.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		monopolyBoard = SOIL_load_OGL_texture(
+			ASSETS"Images/board.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		pawnIcons[0] = SOIL_load_OGL_texture(
+			ASSETS"Images/pawn_red.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		pawnIcons[1] = SOIL_load_OGL_texture(
+			ASSETS"Images/pawn_blue.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		pawnIcons[2] = SOIL_load_OGL_texture(
+			ASSETS"Images/pawn_green.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		pawnIcons[3] = SOIL_load_OGL_texture(
+			ASSETS"Images/pawn_yellow.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		playerXTurn[0] = SOIL_load_OGL_texture(
+			ASSETS"Images/p1_Turn.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		playerXTurn[1] = SOIL_load_OGL_texture(
+			ASSETS"Images/p2_Turn.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		playerXTurn[2] = SOIL_load_OGL_texture(
+			ASSETS"Images/p3_Turn.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		playerXTurn[3] = SOIL_load_OGL_texture(
+			ASSETS"Images/p4_Turn.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		houseIcons[0] = SOIL_load_OGL_texture(
+			ASSETS"Images/house_red.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		houseIcons[1] = SOIL_load_OGL_texture(
+			ASSETS"Images/house_blue.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		houseIcons[2] = SOIL_load_OGL_texture(
+			ASSETS"Images/house_green.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+
+		houseIcons[3] = SOIL_load_OGL_texture(
+			ASSETS"Images/house_yellow.png",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
 	}
 
 	// Create all 4 vertices of the quad
@@ -268,6 +375,37 @@ void Initialize()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//	first spaces
+	spacePos[0][0] = glm::vec2(286, -305);
+	spacePos[1][0] = glm::vec2(286, -305);
+	spacePos[2][0] = glm::vec2(286, -305);
+	spacePos[3][0] = glm::vec2(286, -305);
+
+	for (int i = 1;i < 11;i++) {	//	set values for bottom spaces
+		spacePos[0][i] = glm::vec2(spacePos[0][i - 1].x - shiftDistance, spacePos[0][i - 1].y);
+		spacePos[1][i] = glm::vec2(spacePos[1][i - 1].x - shiftDistance, spacePos[1][i - 1].y);
+		spacePos[2][i] = glm::vec2(spacePos[2][i - 1].x - shiftDistance, spacePos[2][i - 1].y);
+		spacePos[3][i] = glm::vec2(spacePos[3][i - 1].x - shiftDistance, spacePos[3][i - 1].y);
+	}
+	for (int i = 11;i < 21;i++) {	//	set values for left spaces
+		spacePos[0][i] = glm::vec2(spacePos[0][i - 1].x, spacePos[0][i - 1].y + (shiftDistance + 2));
+		spacePos[1][i] = glm::vec2(spacePos[1][i - 1].x, spacePos[1][i - 1].y + (shiftDistance + 2));
+		spacePos[2][i] = glm::vec2(spacePos[2][i - 1].x, spacePos[2][i - 1].y + (shiftDistance + 2));
+		spacePos[3][i] = glm::vec2(spacePos[3][i - 1].x, spacePos[3][i - 1].y + (shiftDistance + 2));
+	}
+	for (int i = 21;i < 31;i++) {	//	set values for top spaces
+		spacePos[0][i] = glm::vec2(spacePos[0][i - 1].x + shiftDistance, spacePos[0][i - 1].y);
+		spacePos[1][i] = glm::vec2(spacePos[1][i - 1].x + shiftDistance, spacePos[1][i - 1].y);
+		spacePos[2][i] = glm::vec2(spacePos[2][i - 1].x + shiftDistance, spacePos[2][i - 1].y);
+		spacePos[3][i] = glm::vec2(spacePos[3][i - 1].x + shiftDistance, spacePos[3][i - 1].y);
+	}
+	for (int i = 31;i < 41;i++) {	//	set values for right spaces
+		spacePos[0][i] = glm::vec2(spacePos[0][i - 1].x, spacePos[0][i - 1].y - (shiftDistance + 2));
+		spacePos[1][i] = glm::vec2(spacePos[1][i - 1].x, spacePos[1][i - 1].y - (shiftDistance + 2));
+		spacePos[2][i] = glm::vec2(spacePos[2][i - 1].x, spacePos[2][i - 1].y - (shiftDistance + 2));
+		spacePos[3][i] = glm::vec2(spacePos[3][i - 1].x, spacePos[3][i - 1].y - (shiftDistance + 2));
+	}
 }
 
 void Update(float a_deltaTime) {
@@ -286,9 +424,17 @@ void Render() {
 	glActiveTexture(GL_TEXTURE0);
 	int Spacing = 200, Size = 200;
 
-	glBindTexture(GL_TEXTURE_2D, BTexture);
-	DrawQuad(glm::vec2(-Spacing / 2, 0.0f), glm::vec2(20, 3 * Size));
+	glBindTexture(GL_TEXTURE_2D, monopolyBoard);
+	DrawQuad(glm::vec2(0.0f, 0.0f), glm::vec2(boardSize, boardSize));
 
+	for (int i = 0;i < 40;i++) {
+		glBindTexture(GL_TEXTURE_2D, pawnIcons[0]);
+		DrawQuad(spacePos[0][i], glm::vec2(pawnIconSize, pawnIconSize));
+
+		glBindTexture(GL_TEXTURE_2D, pawnIcons[1]);
+		DrawQuad(spacePos[1][i], glm::vec2(pawnIconSize, pawnIconSize));
+		//std::cout << "Position " + std::to_string(i) + ": " + std::to_string(spacePos[i].x) + ", " + std::to_string(spacePos[i].y) << std::endl;
+	}
 
 	glUseProgram(GL_NONE);
 }
