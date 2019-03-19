@@ -103,10 +103,8 @@ void CheckIfTownship(Data &Data_Info, PlayerInfo(&players)[PlayerNum], int p) {
 	//if (p == Data_Info.LandOwnerShip[31] && p == Data_Info.LandOwnerShip[32] && p == Data_Info.LandOwnerShip[34]) { players[p].Townships.push_back(6); } //Green
 	//if (p == Data_Info.LandOwnerShip[37] && p == Data_Info.LandOwnerShip[39]) { players[p].Townships.push_back(7); } //Dark Blue
 }
-bool CanUpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, int zone) {
-
-	double Multiplyer = 2;
-	if (zone == 0 && players[p].Money >= ((HousePrice[1] + HousePrice[3]) * Multiplyer)) { return true; } //Brown
+bool CanUpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, int zone, double Multiplyer = 1) {
+		 if (zone == 0 && players[p].Money >= ((HousePrice[1] + HousePrice[3]) * Multiplyer)) { return true; } //Brown
 	else if (zone == 1 && players[p].Money >= ((HousePrice[6] + HousePrice[8] + HousePrice[9])  * Multiplyer)) { return true; }  //Light Blue
 	else if (zone == 2 && players[p].Money >= ((HousePrice[11] + HousePrice[13] + HousePrice[14]) * Multiplyer)) { return true; } //Pink
 	else if (zone == 3 && players[p].Money >= ((HousePrice[16] + HousePrice[18] + HousePrice[19]) * Multiplyer)) { return true; } //Orange
@@ -116,7 +114,7 @@ bool CanUpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, int zone) {
 	else if (zone == 7 && players[p].Money >= ((HousePrice[37] + HousePrice[39]) * Multiplyer)) { return true; } //Dark Blue
 	else { return false; }
 }
-void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
+void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output, int space = 0) {
 
 	if (players[p].Money <= 0) { return; }
 	int Max = 6; //Need to add cases where is goes passed 6 (passed one hotel)
@@ -130,7 +128,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 				if (players[p].Townships[i] == 1) {
 					switch (i)
 					{
-					case 0: if (CanUpgradeTownship(players, p, 0)) {
+					case 0: if (CanUpgradeTownship(players, p, 0, 2)) {
 						if (players[p].Land[1] < Max) { players[p].Land[1] += 1; amount += HousePrice[1]; }
 						if (players[p].Land[3] < Max) { players[p].Land[3] += 1; amount += HousePrice[3]; }
 						if (amount > 0) {
@@ -141,7 +139,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Brown
-					case 1: if (CanUpgradeTownship(players, p, 1)) {
+					case 1: if (CanUpgradeTownship(players, p, 1, 2)) {
 						if (players[p].Land[6] < Max) { players[p].Land[6] += 1; amount += HousePrice[6]; }
 						if (players[p].Land[8] < Max) { players[p].Land[8] += 1; amount += HousePrice[8]; }
 						if (players[p].Land[9] < Max) { players[p].Land[9] += 1; amount += HousePrice[9]; }
@@ -153,7 +151,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Light Blue
-					case 2: if (CanUpgradeTownship(players, p, 2)) {
+					case 2: if (CanUpgradeTownship(players, p, 2, 2)) {
 						if (players[p].Land[11] < Max) { players[p].Land[11] += 1; amount += HousePrice[11]; }
 						if (players[p].Land[13] < Max) { players[p].Land[13] += 1; amount += HousePrice[13]; }
 						if (players[p].Land[14] < Max) { players[p].Land[14] += 1; amount += HousePrice[14]; }
@@ -165,7 +163,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Pink
-					case 3: if (CanUpgradeTownship(players, p, 3)) {
+					case 3: if (CanUpgradeTownship(players, p, 3, 2)) {
 						if (players[p].Land[16] < Max) { players[p].Land[16] += 1; amount += HousePrice[16]; }
 						if (players[p].Land[18] < Max) { players[p].Land[18] += 1; amount += HousePrice[18]; }
 						if (players[p].Land[19] < Max) { players[p].Land[19] += 1; amount += HousePrice[19]; }
@@ -177,7 +175,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Orange
-					case 4: if (CanUpgradeTownship(players, p, 4)) {
+					case 4: if (CanUpgradeTownship(players, p, 4, 2)) {
 						if (players[p].Land[21] < Max) { players[p].Land[21] += 1; amount += HousePrice[21]; }
 						if (players[p].Land[23] < Max) { players[p].Land[23] += 1; amount += HousePrice[23]; }
 						if (players[p].Land[24] < Max) { players[p].Land[24] += 1; amount += HousePrice[24]; }
@@ -189,7 +187,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Red
-					case 5: if (CanUpgradeTownship(players, p, 5)) {
+					case 5: if (CanUpgradeTownship(players, p, 5, 2)) {
 						if (players[p].Land[26] < Max) { players[p].Land[26] += 1; amount += HousePrice[26]; }
 						if (players[p].Land[27] < Max) { players[p].Land[27] += 1; amount += HousePrice[27]; }
 						if (players[p].Land[29] < Max) { players[p].Land[29] += 1; amount += HousePrice[29]; }
@@ -201,7 +199,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Yellow
-					case 6: if (CanUpgradeTownship(players, p, 6)) {
+					case 6: if (CanUpgradeTownship(players, p, 6, 2)) {
 						if (players[p].Land[31] < Max) { players[p].Land[31] += 1; amount += HousePrice[31]; }
 						if (players[p].Land[32] < Max) { players[p].Land[32] += 1; amount += HousePrice[32]; }
 						if (players[p].Land[34] < Max) { players[p].Land[34] += 1; amount += HousePrice[34]; }
@@ -213,7 +211,7 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 							BoughtSomething = true;
 						}
 					} break; //Green
-					case 7: if (CanUpgradeTownship(players, p, 7)) {
+					case 7: if (CanUpgradeTownship(players, p, 7, 2)) {
 						if (players[p].Land[37] < Max) { players[p].Land[37] += 1; amount += HousePrice[37]; }
 						if (players[p].Land[39] < Max) { players[p].Land[39] += 1; amount += HousePrice[39]; }
 						if (amount > 0) {
@@ -233,7 +231,16 @@ void UpgradeTownship(PlayerInfo(&players)[PlayerNum], int p, std::string& Output
 		}
 	}
 	//Human Decides
-	else {}
+	else {
+		int amount = HousePrice[space];
+		if (players[p].Money >= amount && players[p].Land[space] < Max) {
+			players[p].Land[space] += 1;
+			players[p].Money -= amount;
+			//Output.append("[Upgraded "+space+" $" + std::to_string(amount) + "] ");
+			//Output.append("[$" + std::to_string(players[p].Money) + "] ");
+			CalculateAmountOfHouses(players, p);
+		}
+	}
 }
 
 int CheckLandPrice(Data& Data_Info, int space) {
@@ -333,7 +340,7 @@ void CalculateRentPayment(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int 
 	}
 }
 
-void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance) {
+void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance, int space = 0) {
 	if (players[p].Money <= 0) { return; }
 	if (players[p].AI) {
 		std::string ADD;
@@ -341,6 +348,7 @@ void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Out
 		//UnMortgage [Property] in a [Township]
 		for (int i = 0; i < 10; i++) {
 			//If (player) has [Township] (i)
+			//importance is between -1 and 1, and if it is above zero it is important
 			if (players[p].Townships[i] == 1 && importance[i+1] > 0) {
 				std::vector<int> properties = GetPropertiesInTownship(i);
 				for (int j = 0; j < properties.size(); j++) {
@@ -378,9 +386,15 @@ void UnMortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Out
 		}
 	}
 	//Human Decides
-	else {}
+	else {
+		//If (player) has [Property]: UnMortgage it
+		if (players[p].LandMortgaged[space] == true) {
+			players[p].LandMortgaged[space] = false;
+			players[p].Money -= (int)(PropertyPrice[space] * 0.5);
+		}
+	}
 }
-void MortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output) {
+void MortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Output, int space = 0, int sell = 0) {
 	if (players[p].AI) {
 		std::string ADD;
 		//Mortgage [Property] not in a [Township]
@@ -453,7 +467,18 @@ void MortgageProperty(PlayerInfo(&players)[PlayerNum], int p, std::string& Outpu
 		Output.append("[No Mortgage] ");
 	}
 	//Human Decides
-	else {}
+	else {
+		if (sell == 1 && players[p].Land[space] > 1 && players[p].LandMortgaged[space] == false) {
+			//If (player) has [Houses] to Sell; Sell [Houses]
+			players[p].Land[space] -= 1;
+			players[p].Money += (int)(HousePrice[space] * 0.5);
+		}
+		else if (sell == 2 && players[p].Land[space] == 1 && players[p].LandMortgaged[space] == false) {
+			//If (player) has [Property]; Mortgage it
+			players[p].LandMortgaged[space] = true;
+			players[p].Money += (int)(PropertyPrice[space] * 0.5);
+		}
+	}
 }
 
 #pragma endregion

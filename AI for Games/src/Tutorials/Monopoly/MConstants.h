@@ -21,6 +21,7 @@ const int RollsPerGame = 800; //Total rolls per game
 const int Games = 5000; //Total amount of games
 const int PlayerNum = 4;
 //Names of all Streets in order
+const std::string StreetColour[] = { "Brown","Light Blue","Pink","Orange","Red","Yellow","Green","Blue","Utilities","Railroads" };
 const std::string StreetNames[] = {
 	"GO","Mediterranean Ave.","Community Chest","Baltic Ave.","Income Tax","Reading Railroad","Oriental Ave.","Chance","Vermont Ave.","Connecticut Ave.",
 	"Just Visiting Jail","St. Charles Place","Electric Company","States Ave.","Virginia Ave.","Pennsylvania Railroad","St. James Place","Community Chest","Tennessee Ave.","New York Ave.",

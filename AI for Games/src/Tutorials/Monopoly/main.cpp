@@ -48,6 +48,9 @@ int UI_State = 0;
 bool game_Inprogress = false;
 int UserMoney = 0;
 int UserPosition = 0;
+int UserHasTownships = 0;
+int UserHasMortgaged = 0;
+int UserHasHouses = 0;
 
 MonopolyGame game;
 
@@ -154,25 +157,20 @@ void UserInitialize() {
 	//std::cout << std::endl << std::endl;
 	//if (!Display) { GetData(); }
 }
+
 void UserUpdate() {
 	//Keep going until game games are done.
+	if (game_Inprogress && UI_State == 1) {
+		game.AIMove();
+		//if (run > 400) { game.MonopolyShowMe(game.CurrentPlayer); }
 
-	if (game_Inprogress) {
-		//A single players move
-		if (game.players[game.CurrentPlayer].AI) { 
-			game.AIMove();
-			if (run > 400) { game.MonopolyShowMe(game.CurrentPlayer); }
-		}
-		else { game.PlayerMove(); }
-
-		
 		if (2 > (PlayerNum - game.AmountDead) || game.rolls >= RollsPerGame) {
 			game.EndGame();
 			games_Finished += 1;
 			//There are more games to get through, so continue.
-			if (games_Finished < Games) { 
+			if (games_Finished < Games) {
 				game = MonopolyGame();
-				game.StartGame(); 
+				game.StartGame();
 			}
 			//No games left, so stop.
 			else {
@@ -182,7 +180,15 @@ void UserUpdate() {
 				if (Display) { DisplayStats(game.players, y); }
 			}
 		}
-		//std::cout << game.CurrentPlayer; ParseString(game.Output); std::cout << std::endl;
+	} 
+	else if (game_Inprogress && UI_State == 2) {
+		//A single players move
+		if (game.players[game.CurrentPlayer].AI) { game.AIMove(); }
+		else { game.PlayerMove(); }
+		if (2 > (PlayerNum - game.AmountDead)) {
+			game.EndGame();
+			game_Inprogress = false;
+		}
 	}
 	
 }
@@ -290,6 +296,7 @@ void Render() {
 void GUI(){
 	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.4f); 
 	{
+		PlayerInfo &player = game.players[game.CurrentPlayer];
 		switch (UI_State) {
 			//Starting UI
 		case 0: {
@@ -326,49 +333,181 @@ void GUI(){
 		} break;
 			//Player vs AI
 		case 2: {
-			//If UI f* off.
-			//if (game.players[game.CurrentPlayer].AI) { return; }
 
-			if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
-			if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); } ImGui::SameLine();
-			if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
+			if (game_Inprogress) {
+				if (ImGui::Button("Roll than end turn")) { game.PlayerMove(Action::RollDie); game.PlayerMove(Action::EndTurn); }
+				if (ImGui::Button("Roll")) { game.PlayerMove(Action::RollDie); } ImGui::SameLine();
+				if (ImGui::Button("End Turn")) { game.PlayerMove(Action::EndTurn); }
 
-			UserMoney = game.players[game.CurrentPlayer].Money;
-			UserPosition = game.players[game.CurrentPlayer].position;
+				UserMoney = player.Money;
+				UserPosition = player.position;
 
-			ImGui::Text("============================");
-			ImGui::Text("Current Position: %i", UserPosition);
-			ImGui::Text("Current Funds: $ %i", UserMoney);
+				ImGui::Text("============================");
+				ImGui::Text("Current Position: %s : %i", StreetNames[UserPosition].c_str(), UserPosition);
+				ImGui::Text("Current Funds: $ %i", UserMoney);
 
-			if (CheckLandPrice(Data_Info, UserPosition) != 0) {
-				if (UserMoney < PropertyPrice[UserPosition]) { ImGui::Text("Not Enough Money To Purchase Property"); }
-				else {
-					ImGui::Text("Property Cost: $%i", PropertyPrice[UserPosition]); ImGui::SameLine();
-					if (ImGui::Button("Buy Property")) { game.PlayerMove(Action::Buying); }
+				if (CheckLandPrice(Data_Info, UserPosition) != 0) {
+					if (UserMoney < PropertyPrice[UserPosition]) { ImGui::Text("Not Enough Money To Purchase Property"); }
+					else {
+						ImGui::Text("Property Cost: $%i", PropertyPrice[UserPosition]); ImGui::SameLine();
+						if (ImGui::Button("Buy Property")) { game.PlayerMove(Action::Buying); }
+					}
+				}
+				else { ImGui::Text("Can't buy current Property"); }
+
+
+				if (UserMoney < 0) {
+					ImGui::Text("/// User doesn't have enough money to continue ///");
+					ImGui::Text("/// Sell, Mortgage, or Trade to stay alive ///");
+					if (ImGui::Button("Die")) {
+						player.AI = true;
+					}
+				}
+
+				if (ImGui::Button("Buy houses")) {
+					UI_State = 3;
+					for (int i = 0; i < 8; i++) {
+						//check to see if the player has that township.
+						if (player.Townships[i] == 1) { UserHasTownships += 1; }
+					}
+				}
+				if (UserHasHouses > 0 && ImGui::Button("Sell Houses")) { UI_State = 4; }
+
+				if (ImGui::Button("Mortgage")) { UI_State = 5; }
+				if (UserHasMortgaged > 0 && ImGui::Button("UnMortgaging")) { UI_State = 6; }
+
+				if (ImGui::Button("Trade")) { UI_State = 7; }
+
+				if (ImGui::Button("Who has what Properties")) { UI_State = 8; }
+
+				if (ImGui::Button("Exit")) {
+					game.EndGame();
+					game_Inprogress = false;
+					player.AI = true;
+					UI_State = 0;
 				}
 			}
-			else { ImGui::Text("Can't buy current Property"); }
-			
-
-			if (UserMoney < 0) { ImGui::Text("Not Enough Money To Upgrade"); }
-			else { if (ImGui::Button("Upgrade")) { game.PlayerMove(Action::Upgrading); } }
-
-			if (ImGui::Button("Mortgage")) { game.PlayerMove(Action::Mortgaging); }
-
-			if (ImGui::Button("Trade")) { game.PlayerMove(Action::Trading); }
-
-			if (ImGui::Button("Exit")) {
-				game.EndGame();
-				game_Inprogress = false;
-				game.players[PlayerNumber].AI = true;
-				UI_State = 0;
+			else {
+				ImGui::Text("YOU WON!!!");
+				if (ImGui::Button("Exit")) {
+					UI_State = 0;
+					player.AI = true;
+				}
 			}
 		} break;
-		case 3: {} break;
-		case 4: {} break;
-		case 5: {} break;
-		case 6: {} break;
-		case 7: {} break;
+			//Upgrading
+		case 3: {
+			if (ImGui::Button("Go back")) { UI_State = 2; }
+			ImGui::Text("===Buying houses===");
+			if (UserHasTownships > 0) {
+				ImGui::Text("Current Funds: $ %i", player.Money);
+				std::vector<int> PinT;
+				//Only check to (8) as (9 & 10) are [Utilities] & [Railroads] and can't be upgraded
+				for (int i = 0; i < 8; i++) {
+					//check to see if the player has that township.
+					if (player.Townships[i] == 1) {
+						PinT = GetPropertiesInTownship(i);
+
+						ImGui::Text(StreetColour[i].c_str());
+						for each (int P in PinT) {
+							if (player.LandMortgaged[P]) {
+								if (ImGui::Button(StreetNames[P].c_str())) {} ImGui::SameLine();
+								ImGui::Text("/// Mortgaged ///");
+							}
+							else {
+								if (ImGui::Button(StreetNames[P].c_str())) { game.PlayerMove(Action::Upgrading, P); UserHasHouses++; } ImGui::SameLine();
+								ImGui::Text("$%i", HousePrice[P]); ImGui::SameLine();
+								ImGui::Text("| Amount of homes: %i", player.Land[P] - 1);
+							}
+						}
+						ImGui::Text(" ");
+					}
+				}
+			}
+			else { ImGui::Text("You don't have enough Properties to makeup a township"); }
+		
+		} break;
+			//Sell houses
+		case 4: {
+			if (ImGui::Button("Go back")) { UI_State = 2; }
+			ImGui::Text("===Sell houses===");
+			ImGui::Text("Current Funds: $ %i", player.Money);
+			for (int i = 0; i < 40; i++) {
+				if (player.Land[i] > 0) {
+					if (player.LandMortgaged[i]) {
+						if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+						ImGui::Text("/// Mortgaged ///");
+					}
+					else if (player.Land[i] == 1) {
+						if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+						ImGui::Text("/// No Houses ///");
+					}
+					else {
+						if (ImGui::Button(StreetNames[i].c_str())) { game.PlayerMove(Action::Mortgaging, i, 1); UserHasHouses--; } ImGui::SameLine();
+						ImGui::Text("Sell house for $%i", (int)(HousePrice[i] * 0.5)); ImGui::SameLine();
+						ImGui::Text("| Amount of homes: %i", (player.Land[i] - 1));
+					}
+				}
+			}
+		} break;
+			//Mortgage Property
+		case 5: {
+			if (ImGui::Button("Go back")) { UI_State = 2; }
+			ImGui::Text("===Mortgage===");
+			ImGui::Text("Current Funds: $ %i", player.Money);
+			for (int i = 0; i < 40; i++) {
+				if (player.Land[i] == 1) {
+					if (player.LandMortgaged[i]) {
+						if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+						ImGui::Text("/// Already Mortgaged ///");
+					}
+					else {
+						if (ImGui::Button(StreetNames[i].c_str())) { game.PlayerMove(Action::Mortgaging, i, 2); UserHasMortgaged++; } ImGui::SameLine();
+						ImGui::Text("Mortgage for $%i", (int)(PropertyPrice[i] * 0.5));
+					}
+				}
+				else if (player.Land[i] > 1) {
+					if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+					ImGui::Text("/// Need to sell houses first ///");
+				}
+			}
+		} break;
+			//UnMortgaging Properties
+		case 6: {
+			if (ImGui::Button("Go back")) { UI_State = 2; }
+			ImGui::Text("===UnMortgaging===");
+			ImGui::Text("Current Funds: $ %i", player.Money);
+			for (int i = 0; i < 40; i++) {
+				if (player.Land[i] > 0 && !player.LandMortgaged[i]) {
+					if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+					ImGui::Text("/// Not Mortgaged ///");
+				}
+				else if (player.Land[i] > 0) {
+					if (ImGui::Button(StreetNames[i].c_str())) { game.PlayerMove(Action::UnMortgaging, i); UserHasMortgaged--; } ImGui::SameLine();
+					ImGui::Text("UnMortgage for $%i", (int)(PropertyPrice[i] * 0.5));
+				}
+			}
+		} break;
+			//Trade
+		case 7: {
+			if (ImGui::Button("Go back")) { UI_State = 2; }
+			ImGui::Text("===Trade===");
+			ImGui::Text("Current Funds: $ %i", player.Money);
+			if (ImGui::Button("Trade")) { game.PlayerMove(Action::Trading); }
+		} break;
+		case 8: {
+			if (ImGui::Button("Go back")) { UI_State = 2; }
+			ImGui::Text("===Who Has What===");
+			for (int p = 0; p < 4; p++) {
+				ImGui::Text("Player :%i", (p+1));
+				for (int i = 0; i < 40; i++) {
+					if (game.players[p].Land[i] > 0) { 
+						ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
+						ImGui::Text("| Houses:%i", player.Land[i]);
+					}
+				}
+			}
+		} break;
 
 		}
 	}

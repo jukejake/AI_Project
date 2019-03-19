@@ -427,7 +427,8 @@ enum Action {
 	Waiting,
 	RollDie,
 	Buying, 
-	Upgrading, 
+	Upgrading,
+	SellingHouse,
 	Mortgaging, 
 	UnMortgaging, 
 	Trading, 
@@ -1249,13 +1250,16 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 		CalculateLandPayment(Data_Info, players, p, Output, ResultValues);
 		break;
 	case Action::Upgrading:
-		UpgradeTownship(players, p, Output);
+		UpgradeTownship(players, p, Output, value1); 
+		break;
+	case Action::SellingHouse:
+		MortgageProperty(players, p, Output, value1, value2);
 		break;
 	case Action::Mortgaging:
-		MortgageProperty(players, p, Output);
+		MortgageProperty(players, p, Output, value1, value2);
 		break;
 	case Action::UnMortgaging:
-		UnMortgageProperty(players, p, Output, ResultValues);
+		UnMortgageProperty(players, p, Output, ResultValues, value1);
 		break;
 	case Action::Trading:
 		PlayerRequestTrade(Data_Info, players, Output, value1, value2, value3, value4);
