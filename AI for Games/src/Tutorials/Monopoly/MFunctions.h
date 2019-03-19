@@ -713,7 +713,6 @@ void MonopolyGame::StartGame() {
 	Output = "";
 }
 
-int run = 0;
 void MonopolyGame::EndGame() {
 
 
@@ -760,7 +759,7 @@ void MonopolyGame::EndGame() {
 	for (int i = 0; i < PlayerNum; i++) {
 		if (players[i].DiedAt > highest) { highest = players[i].DiedAt; }
 	}
-	run++;
+	
 	for (int i = 0; i < PlayerNum; i++) {
 		if (players[i].Money < 0) { Data_Info.Players[i].Money.push_back(0); }
 		else { Data_Info.Players[i].Money.push_back(players[i].Money); }
@@ -805,7 +804,7 @@ void MonopolyGame::EndGame() {
 		//std::cout << i << ":T: " << TargetValues[0] << ", " << TargetValues[1] << ", " << TargetValues[2] << ", " << TargetValues[3] << ", " << TargetValues[4] << std::endl;
 		//std::cout << i << ":R: " << ResultValues[0] << ", " << ResultValues[1] << ", " << ResultValues[2] << ", " << ResultValues[3] << ", " << ResultValues[4] << std::endl;
 	}
-	std::cout << run << " \n";
+	
 }
 
 void MonopolyGame::MonopolyShowMe(int p) {

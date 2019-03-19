@@ -78,6 +78,7 @@ int GetTownshipFromProperty(int zone) {
 	else if (zone == 37 || zone == 39) { return 7; } //Dark Blue
 	else if (zone == 12 || zone == 28) { return 8; } //Utilities
 	else if (zone == 5 || zone == 15 || zone == 25 || zone == 35) { return 9; } //Railroads
+	else if (zone >= 0 && zone <= 41) { return 10; }
 	else { return -1; }
 }
 

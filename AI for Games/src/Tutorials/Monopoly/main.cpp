@@ -489,11 +489,11 @@ void GUI(){
 				UserPosition = player.position;
 
 				ImGui::Text("============================");
-				ImGui::Text("Current Position: %s : %i", StreetNames[UserPosition].c_str(), UserPosition);
+				ImGui::Text("Current Position: %s : %i : %s", StreetNames[UserPosition].c_str(), UserPosition, StreetColour[GetTownshipFromProperty(UserPosition)].c_str());
 				ImGui::Text("Current Funds: $ %i", UserMoney);
 
 				if (CheckLandPrice(Data_Info, UserPosition) != 0) {
-					if (UserMoney < PropertyPrice[UserPosition]) { ImGui::Text("Not Enough Money To Purchase Property"); }
+					if (UserMoney < PropertyPrice[UserPosition]) { ImGui::Text("Not Enough Money To Purchase Property : $%i", PropertyPrice[UserPosition]); }
 					else {
 						ImGui::Text("Property Cost: $%i", PropertyPrice[UserPosition]); ImGui::SameLine();
 						if (ImGui::Button("Buy Property")) { game.PlayerMove(Action::Buying); }
@@ -505,9 +505,11 @@ void GUI(){
 				if (UserMoney < 0) {
 					ImGui::Text("/// User doesn't have enough money to continue ///");
 					ImGui::Text("/// Sell, Mortgage, or Trade to stay alive ///");
-					if (ImGui::Button("Die")) {
-						player.AI = true;
-					}
+					if (ImGui::Button("Die")) { player.AI = true; player.isDead = true; } ImGui::SameLine();
+					ImGui::Text(" or let the AI try "); ImGui::SameLine();
+					if (ImGui::Button("AI")) { player.AI = true; }
+					if (ImGui::Button("Die and quit")) { player.AI = true; game.EndGame(); }
+					ImGui::Text(" ");
 				}
 
 				if (ImGui::Button("Buy houses")) {
@@ -534,7 +536,8 @@ void GUI(){
 				}
 			}
 			else {
-				ImGui::Text("YOU WON!!!");
+				if (!player.isDead) { ImGui::Text("YOU WON!!!"); }
+				else { ImGui::Text("Yout lost."); }
 				if (ImGui::Button("Exit")) {
 					UI_State = 0;
 					player.AI = true;
@@ -641,13 +644,16 @@ void GUI(){
 			ImGui::Text("Current Funds: $ %i", player.Money);
 			if (ImGui::Button("Trade")) { game.PlayerMove(Action::Trading); }
 		} break;
+			//Who Has What
 		case 8: {
 			if (ImGui::Button("Go back")) { UI_State = 2; }
 			ImGui::Text("===Who Has What===");
 			for (int p = 0; p < 4; p++) {
 				ImGui::Text("Player :%i", (p+1));
+				ImGui::Text("Current Funds: $ %i", game.players[p].Money);
 				for (int i = 0; i < 40; i++) {
 					if (game.players[p].Land[i] > 0) { 
+						ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
 						ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
 						ImGui::Text("| Houses:%i", player.Land[i]);
 					}
