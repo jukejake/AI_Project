@@ -1,51 +1,51 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\imgui.cpp">
+    <ClCompile Include="C:\Github\AI_Project\AI for Games\external\imgui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\imgui_demo.cpp">
+    <ClCompile Include="C:\Github\AI_Project\AI for Games\external\imgui\imgui_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\imgui_draw.cpp">
+    <ClCompile Include="C:\Github\AI_Project\AI for Games\external\imgui\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\examples\opengl3_example\imgui_impl_glfw_gl3.cpp">
+    <ClCompile Include="C:\Github\AI_Project\AI for Games\external\imgui\examples\opengl3_example\imgui_impl_glfw_gl3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\imconfig.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\imgui.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\imgui_internal.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\imgui_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\stb_rect_pack.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\stb_rect_pack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\stb_textedit.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\stb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\stb_truetype.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\stb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\external\imgui\examples\opengl3_example\imgui_impl_glfw_gl3.h">
+    <ClInclude Include="C:\Github\AI_Project\AI for Games\external\imgui\examples\opengl3_example\imgui_impl_glfw_gl3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\100581854\Documents\GitHub\AI_Project\AI for Games\CMakeLists.txt" />
+    <CustomBuild Include="C:\Github\AI_Project\AI for Games\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{316D2D2B-AEEA-3EA6-A09C-ACB549D45C67}</UniqueIdentifier>
+      <UniqueIdentifier>{07614A23-7702-359B-880E-BDE9B7268138}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{3F524A9E-C498-35C3-BE04-C0E6F0FF56D2}</UniqueIdentifier>
+      <UniqueIdentifier>{0A668413-A5AA-3553-80D1-8D74DDE30C85}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

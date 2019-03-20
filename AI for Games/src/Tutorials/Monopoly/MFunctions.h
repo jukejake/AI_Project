@@ -660,7 +660,7 @@ public:
 	void StartGame(); //PlayerInfo(&players)[PlayerNum]
 	void EndGame();
 	void AIMove();
-	void PlayerMove(int action, int value1, int value2, int value3, int value4);
+	void PlayerMove(int action, int value1, int value2, std::vector<int> value3, std::vector<int> value4);
 	int RollDice();
 	void MonopolyShowMe(int p);
 
@@ -714,7 +714,6 @@ void MonopolyGame::StartGame() {
 	Output = "";
 }
 
-int run = 0;
 void MonopolyGame::EndGame() {
 
 
@@ -761,7 +760,7 @@ void MonopolyGame::EndGame() {
 	for (int i = 0; i < PlayerNum; i++) {
 		if (players[i].DiedAt > highest) { highest = players[i].DiedAt; }
 	}
-	run++;
+
 	for (int i = 0; i < PlayerNum; i++) {
 		if (players[i].Money < 0) { Data_Info.Players[i].Money.push_back(0); }
 		else { Data_Info.Players[i].Money.push_back(players[i].Money); }
@@ -806,7 +805,7 @@ void MonopolyGame::EndGame() {
 		//std::cout << i << ":T: " << TargetValues[0] << ", " << TargetValues[1] << ", " << TargetValues[2] << ", " << TargetValues[3] << ", " << TargetValues[4] << std::endl;
 		//std::cout << i << ":R: " << ResultValues[0] << ", " << ResultValues[1] << ", " << ResultValues[2] << ", " << ResultValues[3] << ", " << ResultValues[4] << std::endl;
 	}
-	std::cout << run << " \n";
+
 }
 
 void MonopolyGame::MonopolyShowMe(int p) {
@@ -851,8 +850,13 @@ void MonopolyGame::AIMove() {
 		
 
 		ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-		Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - ((int)std::floor(DiceRoll / 6) + 1)) + "] ");
+		Output.append("[" + std::to_string((int)std::floor(DiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[DiceRoll] - (int)std::floor(DiceRoll / 6) - 1) + "] ");
 		ADD = std::to_string(rollvalues[DiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
+
+
+		players[p].FirstDice = ((int)std::floor(DiceRoll / 6) + 1);
+		players[p].SecondDice = (rollvalues[DiceRoll] - (int)std::floor(DiceRoll / 6) - 1);
+
 
 
 		bool IsDouble = false;
@@ -1049,7 +1053,7 @@ void MonopolyGame::AIMove() {
 }
 
 
-void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, int value3 = 0, int value4 = 0) {
+void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, std::vector<int> value3 = { 0 }, std::vector<int> value4 = { 0 }) {
 
 	if (players[CurrentPlayer].isDead) { return; }
 	int p = CurrentPlayer;
@@ -1084,13 +1088,13 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 
 			ADD = std::to_string(players[p].Money); padTo(ADD, 5); Output.append("[$" + ADD + "] ");
 			ADD = std::to_string(players[p].position); padTo(ADD, 2); Output.append("[P:" + ADD + "] ");
-			Output.append("[" + std::to_string((int)std::floor(PlayerDiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[PlayerDiceRoll] - ((int)std::floor(PlayerDiceRoll / 6) + 1)) + "] ");
+			Output.append("[" + std::to_string((int)std::floor(PlayerDiceRoll / 6) + 1) + "|" + std::to_string(rollvalues[PlayerDiceRoll] - (int)std::floor(PlayerDiceRoll / 6) - 1) + "] ");
 			ADD = std::to_string(rollvalues[PlayerDiceRoll]); padTo(ADD, 2); Output.append("[" + ADD + "] ");
 			
 			bool IsDouble = false;
 			
 			players[p].FirstDice = ((int)std::floor(PlayerDiceRoll / 6) + 1);
-			players[p].SecondDice = rollvalues[PlayerDiceRoll] - ((int)std::floor(PlayerDiceRoll / 6) + 1);
+			players[p].SecondDice = (rollvalues[PlayerDiceRoll] - (int)std::floor(PlayerDiceRoll / 6) - 1);
 
 			//Checks for a double
 			for (int i = 0; i < 6; i++) { if (PlayerDiceRoll == DoubleIndex[i]) { IsDouble = true; } }
@@ -1267,7 +1271,7 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, in
 		UnMortgageProperty(players, p, Output, ResultValues, value1);
 		break;
 	case Action::Trading:
-		PlayerRequestTrade(Data_Info, players, Output, value1, value2, value3, value4);
+		PlayerRequestTrade(Data_Info, players, value1, value2, value3, value4);
 		break;
 	case Action::EndTurn:
 		if (PlayerRolled) {

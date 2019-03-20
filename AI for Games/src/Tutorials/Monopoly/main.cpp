@@ -45,20 +45,25 @@ GLuint pawnIcons[4], houseIcons[4], diceSides[6];
 
 const float boardSize = 720.0f, pawnIconSize = 20.0f, shiftDistance = 58.0f;
 const glm::vec2 turnPromptSize = glm::vec2(300, 150);
-glm::vec2 spacePos[4][40];	//	coordinates of the center of each space 
+glm::vec2 spacePos[4][42];	//	coordinates of the center of each space 
 glm::vec2 jailPos;
 float deltaTime, timerVar = 0.0f;
 
 #pragma region User
 int games_Finished = 0;
 int PlayerNumber = 0;
-int UI_State = 0;
+int UI_State = 1;
 bool game_Inprogress = false;
+bool ShowUIData = false;
 int UserMoney = 0;
 int UserPosition = 0;
 int UserHasTownships = 0;
 int UserHasMortgaged = 0;
 int UserHasHouses = 0;
+int TradeWith = 1;
+std::pair <int, int> AIValue = { 0,0 };
+std::vector<int> Offer = {0};
+std::vector<int> Request = {0};
 
 MonopolyGame game;
 
@@ -99,7 +104,7 @@ void ParseString(std::string& Output) {
 				else if (SBuffer == "[C:")				 { SetConsoleTextAttribute(hConsole, 10); } //
 				else if (SBuffer == "[M:")				 { SetConsoleTextAttribute(hConsole,  4); } //Mortgaging Land 
 				else if (SBuffer == "[UM:")				 { SetConsoleTextAttribute(hConsole,  2); } //Un-Mortgaging Land
-				else if (SBuffer == "[SH:")				 { SetConsoleTextAttribute(hConsole,  4); } //Selling Land
+				else if (SBuffer == "[SH:")				 { SetConsoleTextAttribute(hConsole,  4); } //Selling House
 				else if (SBuffer == "[Trade:")			 { SetConsoleTextAttribute(hConsole,112); } //Trading Land
 				else if (SBuffer == "[ERROR:")			 { SetConsoleTextAttribute(hConsole,206); } //224
 				else if (SBuffer == "[R:")				 { SetConsoleTextAttribute(hConsole,  7); } //Roll number
@@ -168,13 +173,14 @@ void UserInitialize() {
 
 void UserUpdate() {
 	//Keep going until game games are done.
-	if (game_Inprogress && UI_State == 1) {
+	if (game_Inprogress && UI_State == 0) {
 		game.AIMove();
-		//if (run > 400) { game.MonopolyShowMe(game.CurrentPlayer); }
+		if (ShowUIData) { game.MonopolyShowMe(game.CurrentPlayer); }
 
-		if (2 > (PlayerNum - game.AmountDead) || game.rolls >= RollsPerGame) {
+		if (2 > (PlayerNum - game.AmountDead)) {
 			game.EndGame();
 			games_Finished += 1;
+			std::cout << games_Finished << std::endl;
 			//There are more games to get through, so continue.
 			if (games_Finished < Games) {
 				game = MonopolyGame();
@@ -184,7 +190,25 @@ void UserUpdate() {
 			else {
 				game_Inprogress = false;
 				games_Finished = 0;
-				UI_State = 0;
+				UI_State = 1;
+				if (Display) { DisplayStats(game.players, y); }
+			}
+		}
+		else if (game.rolls >= RollsPerGame) {
+			for (unsigned short int i = 0; i < PlayerNum; i++) { game.players[i].isDead = true; }
+			game.EndGame();
+			games_Finished += 1;
+			std::cout << games_Finished << std::endl;
+			//There are more games to get through, so continue.
+			if (games_Finished < Games) {
+				game = MonopolyGame();
+				game.StartGame();
+			}
+			//No games left, so stop.
+			else {
+				game_Inprogress = false;
+				games_Finished = 0;
+				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
 			}
 		}
@@ -411,31 +435,49 @@ void Initialize()
 	spacePos[1][10].x -= 20;
 	spacePos[2][10].x -= 20;
 	spacePos[3][10].x -= 20;
-	for (int i = 11;i < 21;i++) {	//	set values for left spaces
-		spacePos[0][i] = glm::vec2(spacePos[0][i - 1].x, spacePos[0][i - 1].y + (shiftDistance + 4));
-		spacePos[1][i] = glm::vec2(spacePos[1][i - 1].x, spacePos[1][i - 1].y + (shiftDistance + 4));
-		spacePos[2][i] = glm::vec2(spacePos[2][i - 1].x, spacePos[2][i - 1].y + (shiftDistance + 4));
-		spacePos[3][i] = glm::vec2(spacePos[3][i - 1].x, spacePos[3][i - 1].y + (shiftDistance + 4));
+
+
+	spacePos[0][11] = glm::vec2(spacePos[0][10].x, spacePos[0][10].y + shiftDistance+20);
+	spacePos[1][11] = glm::vec2(spacePos[1][10].x, spacePos[1][10].y + shiftDistance+20);
+	spacePos[2][11] = glm::vec2(spacePos[2][10].x, spacePos[2][10].y + shiftDistance+20);
+	spacePos[3][11] = glm::vec2(spacePos[3][10].x, spacePos[3][10].y + shiftDistance+20);
+	for (int i = 12;i < 21;i++) {	//	set values for left spaces
+		spacePos[0][i] = glm::vec2(spacePos[0][i - 1].x, spacePos[0][i - 1].y + shiftDistance+1);
+		spacePos[1][i] = glm::vec2(spacePos[1][i - 1].x, spacePos[1][i - 1].y + shiftDistance+1);
+		spacePos[2][i] = glm::vec2(spacePos[2][i - 1].x, spacePos[2][i - 1].y + shiftDistance+1);
+		spacePos[3][i] = glm::vec2(spacePos[3][i - 1].x, spacePos[3][i - 1].y + shiftDistance+1);
 	}
-	for (int i = 21;i < 31;i++) {	//	set values for top spaces
-		spacePos[0][i] = glm::vec2(spacePos[0][i - 20].x + shiftDistance, spacePos[0][i - 20].y + 630);
-		spacePos[1][i] = glm::vec2(spacePos[1][i - 20].x + shiftDistance, spacePos[1][i - 20].y + 630);
-		spacePos[2][i] = glm::vec2(spacePos[2][i - 20].x + shiftDistance, spacePos[2][i - 20].y + 630);
-		spacePos[3][i] = glm::vec2(spacePos[3][i - 20].x + shiftDistance, spacePos[3][i - 20].y + 630);
+
+	spacePos[0][21] = glm::vec2(spacePos[0][10].x + shiftDistance*1.3, spacePos[0][1].y + 630);
+	spacePos[1][21] = glm::vec2(spacePos[1][10].x + shiftDistance*1.3, spacePos[1][1].y + 630);
+	spacePos[2][21] = glm::vec2(spacePos[2][10].x + shiftDistance*1.3, spacePos[2][1].y + 630);
+	spacePos[3][21] = glm::vec2(spacePos[3][10].x + shiftDistance*1.3, spacePos[3][1].y + 630);
+	for (int i = 22;i < 31;i++) {	//	set values for top spaces
+		int NewX = i-9-(2*(i-20));
+		spacePos[0][i] = glm::vec2(spacePos[0][NewX].x + shiftDistance, spacePos[0][i - 20].y + 630);
+		spacePos[1][i] = glm::vec2(spacePos[1][NewX].x + shiftDistance, spacePos[1][i - 20].y + 630);
+		spacePos[2][i] = glm::vec2(spacePos[2][NewX].x + shiftDistance, spacePos[2][i - 20].y + 630);
+		spacePos[3][i] = glm::vec2(spacePos[3][NewX].x + shiftDistance, spacePos[3][i - 20].y + 630);
 	}
 	for (int i = 31;i < 40;i++) {	//	set values for right spaces
-		spacePos[0][i] = glm::vec2(spacePos[0][i - 20].x + 630, spacePos[0][i - 20].y);
-		spacePos[1][i] = glm::vec2(spacePos[1][i - 20].x + 630, spacePos[1][i - 20].y);
-		spacePos[2][i] = glm::vec2(spacePos[2][i - 20].x + 630, spacePos[2][i - 20].y);
-		spacePos[3][i] = glm::vec2(spacePos[3][i - 20].x + 630, spacePos[3][i - 20].y);
+		int NewY = i-10-(2*(i-30));
+		spacePos[0][i] = glm::vec2(spacePos[0][i - 20].x + 630, spacePos[0][NewY].y);
+		spacePos[1][i] = glm::vec2(spacePos[1][i - 20].x + 630, spacePos[1][NewY].y);
+		spacePos[2][i] = glm::vec2(spacePos[2][i - 20].x + 630, spacePos[2][NewY].y);
+		spacePos[3][i] = glm::vec2(spacePos[3][i - 20].x + 630, spacePos[3][NewY].y);
 	}
 	
 	//	set jail positions
-	jailPos = glm::vec2(-296, -302.5);	
+	jailPos = glm::vec2(-296, -302.5);
 	spacePos[0][10] = glm::vec2(-288.5, -347.5);
 	spacePos[1][10] = glm::vec2(-325, -347.5);
-	spacePos[2][10] = glm::vec2(-346.5, -285);
+	spacePos[2][10] = glm::vec2(-346.5, -320);
 	spacePos[3][10] = glm::vec2(-346.5, -285);
+
+	spacePos[0][40] = glm::vec2(-280, -320);
+	spacePos[1][40] = glm::vec2(-280, -285);
+	spacePos[2][40] = glm::vec2(-320, -320);
+	spacePos[3][40] = glm::vec2(-320, -285);
 }
 
 void Update(float a_deltaTime) {
@@ -460,7 +502,7 @@ void Render() {
 	glBindTexture(GL_TEXTURE_2D, monopolyBoard);
 	DrawQuad(glm::vec2(0.0f, 0.0f), glm::vec2(boardSize, boardSize));
 
-	for (int i = 0;i < 4;i++) {
+	for (int i = 0; i < 4;i++) {
 		switch (game.players[i].isDead) {
 			case false:
 				glBindTexture(GL_TEXTURE_2D, pawnIcons[i]);
@@ -469,10 +511,10 @@ void Render() {
 		}
 	}
 
-	glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].FirstDice]);
+	glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].FirstDice-1]);
 	DrawQuad(glm::vec2(-100, 0), glm::vec2(60, 60));
 
-	glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].SecondDice]);
+	glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].SecondDice-1]);
 	DrawQuad(glm::vec2(100, 0), glm::vec2(60, 60));
 	//std::cout << "Position " + std::to_string(i) + ": " + std::to_string(spacePos[i].x) + ", " + std::to_string(spacePos[i].y) << std::endl;
 
@@ -480,23 +522,34 @@ void Render() {
 }
 
 void GUI() {
-	ImGui::Begin("Settings", 0, ImVec2(300, 300), 0.8f);
+	ImGui::Begin("Settings", 0, ImVec2(650, 650), 0.8f);
 	{
-		for (int i = 0;i < 4;i++) {
-			ImGui::Text("%i, %i", diceSides[game.players[i].FirstDice], diceSides[game.players[i].SecondDice]);
-		}
 
 		PlayerInfo &player = game.players[game.CurrentPlayer];
 		switch (UI_State) {
-			//Starting UI
+			//AI vs AI
 		case 0: {
-			//game.players[3].AI = false;
-			if (ImGui::Button("Start Game: AI vs AI")) {
-				game_Inprogress = true;
-				//Display = false;
+			if (ImGui::Button("Stop running games")) {
+				game.EndGame();
+				game_Inprogress = false;
+				UI_State = 1;
+			}
+			if (ImGui::Button("Show UI choices")) { ShowUIData = true; }
+			if (ImGui::Button("Hide UI choices")) { ShowUIData = false; }
+			if (ImGui::Button("End current game and start a new one")) {
+				game.EndGame();
 				game = MonopolyGame();
 				game.StartGame();
-				UI_State = 1;
+			}
+		} break;
+			//Starting UI
+		case 1:{
+			if (ImGui::Button("Start Game: AI vs AI")) {
+				game_Inprogress = true;
+				Display = false;
+				game = MonopolyGame();
+				game.StartGame();
+				UI_State = 0;
 			}
 			ImGui::SliderInt("Player Number", &PlayerNumber, 0, 3);
 			if (ImGui::Button("Start Game: Player vs AI")) {
@@ -507,20 +560,7 @@ void GUI() {
 				game.players[PlayerNumber].AI = false;
 				UI_State = 2;
 			}
-		} break;
-			//AI vs AI
-		case 1: {
-			if (ImGui::Button("Stop running games")) {
-				game.EndGame();
-				game_Inprogress = false;
-				UI_State = 0;
-			}
-			if (ImGui::Button("End current game and start a new one")) {
-				game.EndGame();
-				game = MonopolyGame();
-				game.StartGame();
-			}
-		} break;
+		}break;
 			//Player vs AI
 		case 2: {
 
@@ -536,7 +576,7 @@ void GUI() {
 				ImGui::Text("Current Position: %s : %i : %s", StreetNames[UserPosition].c_str(), UserPosition, StreetColour[GetTownshipFromProperty(UserPosition)].c_str());
 				ImGui::Text("Current Funds: $ %i", UserMoney);
 
-				if (CheckLandPrice(Data_Info, UserPosition) != 0) {
+				if (CheckLandPrice(Data_Info, UserPosition) != 0 && Data_Info.LandOwnerShip[UserPosition] == -1) {
 					if (UserMoney < PropertyPrice[UserPosition]) { ImGui::Text("Not Enough Money To Purchase Property : $%i", PropertyPrice[UserPosition]); }
 					else {
 						ImGui::Text("Property Cost: $%i", PropertyPrice[UserPosition]); ImGui::SameLine();
@@ -576,14 +616,19 @@ void GUI() {
 					game.EndGame();
 					game_Inprogress = false;
 					player.AI = true;
-					UI_State = 0;
+					UI_State = 1;
+				}
+
+				ImGui::Text("===Rolls===");
+				for (int i = 0; i < 4; i++) {
+					ImGui::Text("Player %i rolled %i :[%i] [%i]", (i + 1), (game.players[i].FirstDice + game.players[i].SecondDice), game.players[i].FirstDice, game.players[i].SecondDice);
 				}
 			}
 			else {
 				if (!player.isDead) { ImGui::Text("YOU WON!!!"); }
-				else { ImGui::Text("Yout lost."); }
+				else { ImGui::Text("You lost."); }
 				if (ImGui::Button("Exit")) {
-					UI_State = 0;
+					UI_State = 1;
 					player.AI = true;
 				}
 			}
@@ -651,16 +696,19 @@ void GUI() {
 			for (int i = 0; i < 40; i++) {
 				if (player.Land[i] == 1) {
 					if (player.LandMortgaged[i]) {
-						if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+						ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
+						ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
 						ImGui::Text("/// Already Mortgaged ///");
 					}
 					else {
 						if (ImGui::Button(StreetNames[i].c_str())) { game.PlayerMove(Action::Mortgaging, i, 2); UserHasMortgaged++; } ImGui::SameLine();
-						ImGui::Text("Mortgage for $%i", (int)(PropertyPrice[i] * 0.5));
+						ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
+						ImGui::Text("| Mortgage for $%i", (int)(PropertyPrice[i] * 0.5));
 					}
 				}
 				else if (player.Land[i] > 1) {
-					if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+					ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
+					ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
 					ImGui::Text("/// Need to sell houses first ///");
 				}
 			}
@@ -673,12 +721,14 @@ void GUI() {
 			ImGui::Text("Current Funds: $ %i", player.Money);
 			for (int i = 0; i < 40; i++) {
 				if (player.Land[i] > 0 && !player.LandMortgaged[i]) {
-					if (ImGui::Button(StreetNames[i].c_str())) {} ImGui::SameLine();
+					ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
+					ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
 					ImGui::Text("/// Not Mortgaged ///");
 				}
 				else if (player.Land[i] > 0) {
 					if (ImGui::Button(StreetNames[i].c_str())) { game.PlayerMove(Action::UnMortgaging, i); UserHasMortgaged--; } ImGui::SameLine();
-					ImGui::Text("UnMortgage for $%i", (int)(PropertyPrice[i] * 0.5));
+					ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
+					ImGui::Text("| UnMortgage for $%i", (int)(PropertyPrice[i] * 0.5));
 				}
 			}
 		} break;
@@ -686,8 +736,75 @@ void GUI() {
 		case 7: {
 			if (ImGui::Button("Go back")) { UI_State = 2; }
 			ImGui::Text("===Trade===");
-			ImGui::Text("Current Funds: $ %i", player.Money);
-			if (ImGui::Button("Trade")) { game.PlayerMove(Action::Trading); }
+			ImGui::SliderInt("Trade with", &TradeWith, 0, 3);
+			if (TradeWith != PlayerNumber) {
+				if (ImGui::Button("Clear selection")) {
+					Offer = { 0 };
+					Request = { 0 };
+				}
+				AIValue = HowMuchDoesTheAIWant(Data_Info, game.players, PlayerNumber, TradeWith, Offer, Request);
+				ImGui::Text("AI values that at $%i, $%i", AIValue.first, AIValue.second);
+
+				//Offer
+				ImGui::Text("================"); 
+				ImGui::Text("Current Funds: $ %i", game.players[PlayerNumber].Money);
+				ImGui::Text("===Offering===");
+				ImGui::SliderInt("Offering $", &Offer[0], 0, player.Money);
+				for (int i = 0; i < 40; i++) {
+					if (game.players[PlayerNumber].Land[i] > 0) {
+						if (ImGui::Button(StreetNames[i].c_str())) {
+							std::vector<int>::iterator it; 
+							it = std::find(Offer.begin()+1, Offer.end(), i);
+							//Remove from vector
+							if (it != Offer.end()) { Offer.erase(it); }
+							//Add to offer vector
+							else { Offer.push_back(i); }
+						} ImGui::SameLine();
+						ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
+						if (game.players[PlayerNumber].LandMortgaged[i]) { ImGui::Text("/// Mortgaged ///"); }
+						else { ImGui::Text("| Houses: %i", game.players[PlayerNumber].Land[i] - 1); }
+					}
+				}
+				ImGui::Text("=Properties=");
+				for (unsigned short int j = 1; j < Offer.size(); j++) {
+					ImGui::Text("- %s", StreetNames[Offer[j]].c_str());
+				}
+
+				ImGui::Text(" ");
+				//Request
+				ImGui::Text("================");
+				ImGui::Text("AI Funds: $ %i", game.players[TradeWith].Money);
+				ImGui::Text("===Requesting===");
+				ImGui::SliderInt("Requesting $", &Request[0], 0, game.players[TradeWith].Money);
+				for (int i = 0; i < 40; i++) {
+					if (game.players[TradeWith].Land[i] > 0) {
+						if (ImGui::Button(StreetNames[i].c_str())) {
+							std::vector<int>::iterator it;
+							it = std::find(Request.begin() + 1, Request.end(), i);
+							//Remove from vector
+							if (it != Request.end()) { Request.erase(it); }
+							//Add to offer vector
+							else { Request.push_back(i); }
+						} ImGui::SameLine();
+						ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
+						if (game.players[TradeWith].LandMortgaged[i]) { ImGui::Text("/// Mortgaged ///"); }
+						else { ImGui::Text("| Houses: %i", game.players[TradeWith].Land[i] - 1); }
+					}
+				}
+				ImGui::Text("=Properties=");
+				for (unsigned short int j = 1; j < Request.size(); j++) {
+					ImGui::Text("+ %s", StreetNames[Request[j]].c_str());
+				}
+
+				if (ImGui::Button("Trade")) {
+					if (AIValue.first >= 0 && AIValue.first >= AIValue.second) { game.PlayerMove(Action::Trading, PlayerNumber, TradeWith, Offer, Request); }
+					else if (AIValue.second >= 0 && AIValue.second >= AIValue.first) { game.PlayerMove(Action::Trading, PlayerNumber, TradeWith, Offer, Request); }
+					//No Deal
+					else {}
+					Offer = { 0 };
+					Request = { 0 };
+				}
+			}
 		} break;
 			//Who Has What
 		case 8: {
@@ -695,14 +812,25 @@ void GUI() {
 			ImGui::Text("===Who Has What===");
 			for (int p = 0; p < 4; p++) {
 				ImGui::Text("Player :%i", (p + 1));
-				ImGui::Text("Current Funds: $ %i", game.players[p].Money);
-				for (int i = 0; i < 40; i++) {
-					if (game.players[p].Land[i] > 0) {
-						ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
-						ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
-						ImGui::Text("| Houses:%i", player.Land[i]);
+				if (game.players[p].Money > 0) {
+					ImGui::Text("Current Funds: $ %i", game.players[p].Money);
+					for (int i = 0; i < 40; i++) {
+						if (game.players[p].Land[i] > 0) {
+							if (game.players[p].LandMortgaged[i]) {
+								ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
+								ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
+								ImGui::Text("/// Mortgaged ///");
+							}
+							else {
+								ImGui::Button(StreetNames[i].c_str()); ImGui::SameLine();
+								ImGui::Text(StreetColour[GetTownshipFromProperty(i)].c_str()); ImGui::SameLine();
+								ImGui::Text("| Houses: %i", game.players[p].Land[i] - 1);
+							}
+						}
 					}
 				}
+				else { ImGui::Text("Dead"); }
+				ImGui::Text(" ");
 			}
 		} break;
 
@@ -749,7 +877,7 @@ int main()
 		return 1;
 	}
 
-	window = glfwCreateWindow(width, height, "Assignment 3 - Tic Tac Toe", NULL, NULL);
+	window = glfwCreateWindow(width, height, "Monopoly", NULL, NULL);
 	if (!window)
 	{
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");

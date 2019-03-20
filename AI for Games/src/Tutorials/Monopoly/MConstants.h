@@ -21,7 +21,7 @@ const int RollsPerGame = 800; //Total rolls per game
 const int Games = 5000; //Total amount of games
 const int PlayerNum = 4;
 //Names of all Streets in order
-const std::string StreetColour[] = { "Brown","Light Blue","Pink","Orange","Red","Yellow","Green","Blue","Utilities","Railroads" };
+const std::string StreetColour[] = { "Brown","Light Blue","Pink","Orange","Red","Yellow","Green","Blue","Utilities","Railroads"," " };
 const std::string StreetNames[] = {
 	"GO","Mediterranean Ave.","Community Chest","Baltic Ave.","Income Tax","Reading Railroad","Oriental Ave.","Chance","Vermont Ave.","Connecticut Ave.",
 	"Just Visiting Jail","St. Charles Place","Electric Company","States Ave.","Virginia Ave.","Pennsylvania Railroad","St. James Place","Community Chest","Tennessee Ave.","New York Ave.",
@@ -120,8 +120,8 @@ struct PlayerInfo {
 	bool isDead = false;
 	unsigned int DiedAt = 0;
 
-	int FirstDice;
-	int SecondDice;
+	int FirstDice = 0;
+	int SecondDice = 0;
 
 	//How much a Land has made the player
 	std::vector<int> Land_Made = { 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0 };

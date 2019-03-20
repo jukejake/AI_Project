@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MConstants.h"
+#include <tuple>
 
 #pragma region Trading
 
@@ -172,8 +173,169 @@ void AIRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int buyer,
 	//AI trading with a human
 	else {}
 }
-void PlayerRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], std::string& Output, int space1, int space2, int value1 = 0, int value2 = 0) {
 
+std::pair <int, int> HowMuchDoesTheAIWant(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int From, int To, std::vector<int> Offer, std::vector<int> Request) {
+	std::pair <int, int> Result = {-99,-99};
+	if (Request.size() < 1 || Offer.size() < 1) { return Result; }
+
+	int RequestValueLow = Request[0];
+	int RequestValueHigh = Request[0];
+	for (unsigned short int j = 1; j < Request.size(); j++) {
+
+		int space = Request[j];
+		RequestValueLow += PropertyPrice[space];
+		//buyer, seller, player with the upper-hand
+		int PlayerIndex[2][4];
+		bool Index[4];
+		//Amount of [Money] a player owns over the amount of the [Property] Price
+		PlayerIndex[0][0] = (players[From].Money / PropertyPrice[space]);
+		PlayerIndex[1][0] = (players[To].Money / PropertyPrice[space]);
+		//Amount of [Township] a player owns
+		for (int i = 0; i < 10; i++) {
+			if (players[From].Townships[i] == 1) { PlayerIndex[0][1] += 1; }
+			if (players[To].Townships[i] == 1) { PlayerIndex[1][1] += 1; }
+		}
+		//[Properties] & [Houses]
+		for (int i = 0; i < 40; i++) {
+			if (players[From].Land[i] > 0) {
+				//Amount of [Properties] a player owns
+				PlayerIndex[0][2] += 1;
+				//Amount of [Houses] a player owns
+				PlayerIndex[0][3] += players[From].Land[i];
+			}
+			if (players[To].Land[i] > 0) {
+				//Amount of [Properties] a player owns
+				PlayerIndex[1][2] += 1;
+				//Amount of [Houses] a player owns
+				PlayerIndex[1][3] += players[To].Land[i];
+			}
+		}
+
+		//What player has the upper-hand [Money]
+		if (PlayerIndex[0][0] == PlayerIndex[1][0]) {
+			if ((players[From].Money / PropertyPrice[space]) > (players[To].Money / PropertyPrice[space])) { Index[0] = true; }
+			else { Index[0] = false; }
+		}
+		else if (PlayerIndex[0][0] > PlayerIndex[1][0]) { Index[0] = true; }
+		else { Index[0] = false; }
+		//What player has the upper-hand [Township]
+		if (PlayerIndex[0][1] > PlayerIndex[1][1]) { Index[1] = true; }
+		else { Index[1] = false; }
+		//What player has the upper-hand [Properties]
+		if (PlayerIndex[0][2] > PlayerIndex[1][2]) { Index[2] = true; }
+		else { Index[2] = false; }
+		//What player has the upper-hand [Houses]
+		if (PlayerIndex[0][3] > PlayerIndex[1][3]) { Index[3] = true; }
+		else { Index[3] = false; }
+
+
+		int price = (int)(PriceChart(players, From, To, space, Index)*0.25f*PropertyPrice[space]);
+
+		RequestValueHigh += price;
+	}
+
+
+	int OfferValueLow = Offer[0];
+	int OfferValueHigh = Offer[0];
+	for (unsigned short int j = 1; j < Offer.size(); j++) {
+
+		int space = Offer[j];
+		OfferValueLow += PropertyPrice[space];
+		//buyer, seller, player with the upper-hand
+		int PlayerIndex[2][4];
+		bool Index[4];
+		//Amount of [Money] a player owns over the amount of the [Property] Price
+		PlayerIndex[0][0] = (players[From].Money / PropertyPrice[space]);
+		PlayerIndex[1][0] = (players[To].Money / PropertyPrice[space]);
+		//Amount of [Township] a player owns
+		for (int i = 0; i < 10; i++) {
+			if (players[From].Townships[i] == 1) { PlayerIndex[0][1] += 1; }
+			if (players[To].Townships[i] == 1) { PlayerIndex[1][1] += 1; }
+		}
+		//[Properties] & [Houses]
+		for (int i = 0; i < 40; i++) {
+			if (players[From].Land[i] > 0) {
+				//Amount of [Properties] a player owns
+				PlayerIndex[0][2] += 1;
+				//Amount of [Houses] a player owns
+				PlayerIndex[0][3] += players[From].Land[i];
+			}
+			if (players[To].Land[i] > 0) {
+				//Amount of [Properties] a player owns
+				PlayerIndex[1][2] += 1;
+				//Amount of [Houses] a player owns
+				PlayerIndex[1][3] += players[To].Land[i];
+			}
+		}
+
+		//What player has the upper-hand [Money]
+		if (PlayerIndex[0][0] == PlayerIndex[1][0]) {
+			if ((players[From].Money / PropertyPrice[space]) > (players[To].Money / PropertyPrice[space])) { Index[0] = true; }
+			else { Index[0] = false; }
+		}
+		else if (PlayerIndex[0][0] > PlayerIndex[1][0]) { Index[0] = true; }
+		else { Index[0] = false; }
+		//What player has the upper-hand [Township]
+		if (PlayerIndex[0][1] > PlayerIndex[1][1]) { Index[1] = true; }
+		else { Index[1] = false; }
+		//What player has the upper-hand [Properties]
+		if (PlayerIndex[0][2] > PlayerIndex[1][2]) { Index[2] = true; }
+		else { Index[2] = false; }
+		//What player has the upper-hand [Houses]
+		if (PlayerIndex[0][3] > PlayerIndex[1][3]) { Index[3] = true; }
+		else { Index[3] = false; }
+
+
+		int price = (int)(PriceChart(players, From, To, space, Index)*0.25f*PropertyPrice[space]);
+
+		OfferValueHigh += price;
+	}
+
+	Result.first = (OfferValueLow - RequestValueLow);
+	Result.second = (OfferValueHigh - RequestValueHigh);
+	return Result;
+}
+
+void PlayerRequestTrade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int From, int To, std::vector<int> Offer, std::vector<int> Request) {
+	if (Request.size() < 1 || Offer.size() < 1) { return; }
+
+	
+	players[From].Money += Request[0];
+	players[To].Money -= Request[0];
+
+
+	for (unsigned short int j = 1; j < Request.size(); j++) {
+		int space = Request[j];
+
+		Data_Info.LandOwnerShip[space] = From; //Look up table, to see who owns what
+
+		players[From].Land[space] = 1; //Counts as owning it (no houses yet)
+		players[From].PiT[GetTownshipFromProperty(space)] += 1;
+		CalculateAmountOfHouses(players, From);
+		CheckIfTownship(Data_Info, players, From); //Checks if player has a group of all the same colours
+
+		players[To].Land[space] = 0;
+		players[To].PiT[GetTownshipFromProperty(space)] -= 1;
+		CalculateAmountOfHouses(players, To);
+		CheckIfTownship(Data_Info, players, To); //Checks if player has a group of all the same colours
+	}
+
+	players[From].Money -= Offer[0];
+	players[To].Money += Offer[0];
+	for (unsigned short int j = 1; j < Offer.size(); j++) {
+		int space = Offer[j];
+		Data_Info.LandOwnerShip[space] = To; //Look up table, to see who owns what
+
+		players[To].Land[space] = 1; //Counts as owning it (no houses yet)
+		players[To].PiT[GetTownshipFromProperty(space)] += 1;
+		CalculateAmountOfHouses(players, To);
+		CheckIfTownship(Data_Info, players, To); //Checks if player has a group of all the same colours
+
+		players[From].Land[space] = 0;
+		players[From].PiT[GetTownshipFromProperty(space)] -= 1;
+		CalculateAmountOfHouses(players, From);
+		CheckIfTownship(Data_Info, players, From); //Checks if player has a group of all the same colours
+	}
 }
 void Trade(Data& Data_Info, PlayerInfo(&players)[PlayerNum], int p, std::string& Output, std::vector<double> &importance) {
 
