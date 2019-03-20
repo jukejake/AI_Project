@@ -2,8 +2,14 @@
 
 
 #include <vector>
-
-
+//
+//We don't end up using this
+//
+//NOT IN USE
+//
+//Look in Net.h for the AI code we are using
+//
+//
 
 // Function to generate random numbers in given range  
 float Rand(float LOW, float HIGH) {

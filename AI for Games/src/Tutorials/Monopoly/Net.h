@@ -4,16 +4,24 @@
 #include <cstdlib>
 #include <cmath>	//tanh
 
+//
+//We followed many youtube tutorials to make this code
+// but the tutorial below is where most of our code was 
+// used to learn from and make.
+//https://www.youtube.com/watch?v=KkwX7FkLfug
+//
+
 class Neuron;
 typedef std::vector<Neuron> Layer;
 
 #pragma region Neuron
-
+//A connection between each Neuron.
 struct Connection {
 	double weight;
 	double deltWeight;
 };
 
+//A single neuron makes up one node in the neural network.
 class Neuron {
 public:
 	Neuron(unsigned numOutputs, unsigned myIndex);
@@ -25,8 +33,8 @@ public:
 	void calcHiddenGradients(const Layer &nextLayer);
 	void UpdateInputWeights(Layer &previousLayer);
 private:
-	static double eta;//[0..1] overall net training rate
-	static double alpha;//[0..n] multiplier of last weight change (momentum)
+	static double eta;//[0..1] overall net training rate.
+	static double alpha;//[0..n] multiplier of last weight change (momentum).
 	static double transferFunction(double x);
 	static double transferFunctionDerivative(double x);
 	static double randomWeight() { return rand() / double(RAND_MAX); }
@@ -39,6 +47,7 @@ private:
 double Neuron::eta = 0.15;
 double Neuron::alpha = 0.5;
 
+//Create a neuron and assign it a connection and index.
 Neuron::Neuron(unsigned numOutputs, unsigned myIndex) {
 	for (unsigned c = 0; c < numOutputs; ++c) {
 		m_outputWeights.push_back(Connection());
@@ -46,6 +55,7 @@ Neuron::Neuron(unsigned numOutputs, unsigned myIndex) {
 	}
 	m_myIndex = myIndex;
 }
+//Map to -1 and 1
 double Neuron::transferFunction(double x) {
 	//tanh - output range [-1...1]
 	return tanh(x);
@@ -54,6 +64,7 @@ double Neuron::transferFunctionDerivative(double x) {
 	//tanh Derivative
 	return (double)(1.0-(x*x));
 }
+//Sum of the output weight.
 double Neuron::sumDOW(const Layer &nextLayer) const {
 	double sum = 0.0;
 	for (unsigned n = 0; n < nextLayer.size()-1; ++n) {
@@ -61,27 +72,29 @@ double Neuron::sumDOW(const Layer &nextLayer) const {
 	}
 	return sum;
 }
-
+//Calculate gradient.
 void Neuron::calcOutputGradients(double targetValue) {
 	double delta = targetValue - m_outputValue;
 	m_gradient = (delta*Neuron::transferFunctionDerivative(m_outputValue));
 }
+//Calculate hidden gradient.
 void Neuron::calcHiddenGradients(const Layer &nextLayer) {
 	double dow = sumDOW(nextLayer);
 	m_gradient = (dow*Neuron::transferFunctionDerivative(m_outputValue));
 }
+//update the input weights of the neurons.
 void Neuron::UpdateInputWeights(Layer &previousLayer) {
 	for (unsigned n = 0; n < previousLayer.size(); ++n) {
 		Neuron &neuron = previousLayer[n];
 		double oldDeltWeight = neuron.m_outputWeights[m_myIndex].deltWeight;
 		//eta	:	Learning rate
-		//alpha	:	Momentum rate by last training sample
+		//alpha	:	Momentum rate by last training sample.
 		double newDeltWeight = ((eta * neuron.m_outputValue * m_gradient) + (alpha * oldDeltWeight));
 		neuron.m_outputWeights[m_myIndex].deltWeight = newDeltWeight;
 		neuron.m_outputWeights[m_myIndex].weight += newDeltWeight;
 	}
 }
-
+//Feed the inputs forward through the neurons.
 void Neuron::feedForward(const Layer &previousLayer) {
 	double sum = 0.0;
 	for (unsigned n = 0; n < previousLayer.size(); ++n) {
@@ -90,11 +103,10 @@ void Neuron::feedForward(const Layer &previousLayer) {
 	m_outputValue = Neuron::transferFunction(sum);
 }
 
-//====================================================================================================//
 #pragma endregion
 
 #pragma region Net
-
+//Made from a whole bunch of neurons.
 class Net {
 public:
 	Net();
@@ -116,6 +128,7 @@ private:
 	double m_recentAverageSmoothingFactor;
 };
 Net::Net() {}
+//Create a neural network with a size of topology.
 Net::Net(const std::vector<unsigned> &topology) {
 	unsigned numLayers = topology.size();
 	for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
@@ -128,9 +141,8 @@ Net::Net(const std::vector<unsigned> &topology) {
 		m_layers.back().back().setOutputValue(1.0);
 	}
 }
-
+//Feed the inputs forward through the neural network.
 void Net::feedForward(const std::vector<double> &inputValues) {
-	assert(inputValues.size() == m_layers[0].size()-1);
 	//Assign input values into input neurons
 	for (unsigned i = 0; i < inputValues.size(); ++i) {
 		m_layers[0][i].setOutputValue(inputValues[i]);
@@ -144,7 +156,7 @@ void Net::feedForward(const std::vector<double> &inputValues) {
 		}
 	}
 }
-
+//Feed the intended results back through the neural network for it to learn.
 void Net::backPropagation(const std::vector<double> &targetValues) {
 	Layer &outputLayer = m_layers.back();
 	m_error = 0.0;
@@ -182,7 +194,7 @@ void Net::backPropagation(const std::vector<double> &targetValues) {
 	}
 }
 
-
+//Get the results for the current state of the neural network. 
 void Net::getResults(std::vector<double> &resultValues) const {
 	resultValues.clear();
 	for (unsigned n = 0; n < m_layers.back().size()-1; ++n) {
@@ -190,5 +202,4 @@ void Net::getResults(std::vector<double> &resultValues) const {
 	}
 }
 
-//====================================================================================================//
 #pragma endregion

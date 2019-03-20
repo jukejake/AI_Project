@@ -21,11 +21,12 @@ int x = 120;
 std::vector<std::string> StuffAndThings;
 
 #pragma region Nerual Network
-//33 inputs, 11 outputs. 
-//15 inputs, 11 outputs.
+
+//15 inputs, 11 outputs, and 12 hidden layers.
 std::vector<unsigned int> topology = { 13,12,11 };
 //4 network, 1 for each player, plus a master.
 //Net network[4];
+//Went with a single neural network
 Net SingleNetwork;
 std::vector<double> InputValues;
 std::vector<double> ResultValues;
@@ -34,62 +35,118 @@ std::vector<double> Winning_TargetValues = { 0.5, 1,1,1,1,1, 1,1,1,1,1 };
 std::vector<double> Losing_TargetValues = { 0.5, -1,-1,-1,-1,-1, -1,-1,-1,-1,-1 }; //{ 0.5, 0,0,0,0,0, 0,0,0,0,0 };
 
 
-void feedForwardAI(PlayerInfo(&players)[PlayerNum], int p) {
+void feedForwardAI(PlayerInfo(&players)[PlayerNum], int p, int version2 = 0) {
 	int hightest = 1;
 	for (size_t i = 0; i < 10; i++) {
 		if (players[p].Made_iT[i] > hightest) { hightest = players[p].Made_iT[i]; }
 	}
 
-	InputValues = {
-		(double)players[p].BuyingFrequency[2],
-		(double)players[p].TimesAroundBoard	*0.002,
-		(double)players[p].TotalAssetValue*0.00002,
+	//Default feed forward
+	if (version2 == 0) {
+		InputValues = {
+			(double)players[p].BuyingFrequency[2],
+			(double)players[p].TimesAroundBoard	*0.002,
+			(double)(players[p].TotalAssetValue - players[p].Money)*0.00002,
 
-		(double)players[p].Made_iT[0]/hightest,
-		(double)players[p].Made_iT[1]/hightest,
-		(double)players[p].Made_iT[2]/hightest,
-		(double)players[p].Made_iT[3]/hightest,
-		(double)players[p].Made_iT[4]/hightest,
-		(double)players[p].Made_iT[5]/hightest,
-		(double)players[p].Made_iT[6]/hightest,
-		(double)players[p].Made_iT[7]/hightest,
-		(double)players[p].Made_iT[8]/hightest,
-		(double)players[p].Made_iT[9]/hightest
+			(double)players[p].Made_iT[0] / hightest,
+			(double)players[p].Made_iT[1] / hightest,
+			(double)players[p].Made_iT[2] / hightest,
+			(double)players[p].Made_iT[3] / hightest,
+			(double)players[p].Made_iT[4] / hightest,
+			(double)players[p].Made_iT[5] / hightest,
+			(double)players[p].Made_iT[6] / hightest,
+			(double)players[p].Made_iT[7] / hightest,
+			(double)players[p].Made_iT[8] / hightest,
+			(double)players[p].Made_iT[9] / hightest
 
-		////Land Made: 28
-		////First Side: 6
-		//(double)players[p].Land_Made[1],
-		//(double)players[p].Land_Made[3],
-		//(double)players[p].Land_Made[5],//Second Half
-		//(double)players[p].Land_Made[6],
-		//(double)players[p].Land_Made[8],
-		//(double)players[p].Land_Made[9],
-		////Second Side: 8
-		//(double)players[p].Land_Made[11],
-		//(double)players[p].Land_Made[12],
-		//(double)players[p].Land_Made[13],
-		//(double)players[p].Land_Made[14],
-		//(double)players[p].Land_Made[15],//Second Half
-		//(double)players[p].Land_Made[16],
-		//(double)players[p].Land_Made[18],
-		//(double)players[p].Land_Made[19],
-		////Third Side: 8
-		//(double)players[p].Land_Made[21],
-		//(double)players[p].Land_Made[23],
-		//(double)players[p].Land_Made[24],
-		//(double)players[p].Land_Made[25],//Second Half
-		//(double)players[p].Land_Made[26],
-		//(double)players[p].Land_Made[27],
-		//(double)players[p].Land_Made[28],
-		//(double)players[p].Land_Made[29],
-		////Forth Side: 6
-		//(double)players[p].Land_Made[31],
-		//(double)players[p].Land_Made[32],
-		//(double)players[p].Land_Made[34],
-		//(double)players[p].Land_Made[35],//Second Half
-		//(double)players[p].Land_Made[37],
-		//(double)players[p].Land_Made[39]
-	};
+			////Land Made: 28
+			////First Side: 6
+			//(double)players[p].Land_Made[1],
+			//(double)players[p].Land_Made[3],
+			//(double)players[p].Land_Made[5],//Second Half
+			//(double)players[p].Land_Made[6],
+			//(double)players[p].Land_Made[8],
+			//(double)players[p].Land_Made[9],
+			////Second Side: 8
+			//(double)players[p].Land_Made[11],
+			//(double)players[p].Land_Made[12],
+			//(double)players[p].Land_Made[13],
+			//(double)players[p].Land_Made[14],
+			//(double)players[p].Land_Made[15],//Second Half
+			//(double)players[p].Land_Made[16],
+			//(double)players[p].Land_Made[18],
+			//(double)players[p].Land_Made[19],
+			////Third Side: 8
+			//(double)players[p].Land_Made[21],
+			//(double)players[p].Land_Made[23],
+			//(double)players[p].Land_Made[24],
+			//(double)players[p].Land_Made[25],//Second Half
+			//(double)players[p].Land_Made[26],
+			//(double)players[p].Land_Made[27],
+			//(double)players[p].Land_Made[28],
+			//(double)players[p].Land_Made[29],
+			////Forth Side: 6
+			//(double)players[p].Land_Made[31],
+			//(double)players[p].Land_Made[32],
+			//(double)players[p].Land_Made[34],
+			//(double)players[p].Land_Made[35],//Second Half
+			//(double)players[p].Land_Made[37],
+			//(double)players[p].Land_Made[39]
+		};
+	}
+	//Feed forward where the AI learn to not buy properties
+	else {
+		InputValues = {
+			(double)players[p].BuyingFrequency[2],
+			(double)players[p].TimesAroundBoard	*0.002,
+			(double)players[p].TotalAssetValue*0.00002,
+
+			(double)players[p].Made_iT[0] / hightest,
+			(double)players[p].Made_iT[1] / hightest,
+			(double)players[p].Made_iT[2] / hightest,
+			(double)players[p].Made_iT[3] / hightest,
+			(double)players[p].Made_iT[4] / hightest,
+			(double)players[p].Made_iT[5] / hightest,
+			(double)players[p].Made_iT[6] / hightest,
+			(double)players[p].Made_iT[7] / hightest,
+			(double)players[p].Made_iT[8] / hightest,
+			(double)players[p].Made_iT[9] / hightest
+
+			////Land Made: 28
+			////First Side: 6
+			//(double)players[p].Land_Made[1],
+			//(double)players[p].Land_Made[3],
+			//(double)players[p].Land_Made[5],//Second Half
+			//(double)players[p].Land_Made[6],
+			//(double)players[p].Land_Made[8],
+			//(double)players[p].Land_Made[9],
+			////Second Side: 8
+			//(double)players[p].Land_Made[11],
+			//(double)players[p].Land_Made[12],
+			//(double)players[p].Land_Made[13],
+			//(double)players[p].Land_Made[14],
+			//(double)players[p].Land_Made[15],//Second Half
+			//(double)players[p].Land_Made[16],
+			//(double)players[p].Land_Made[18],
+			//(double)players[p].Land_Made[19],
+			////Third Side: 8
+			//(double)players[p].Land_Made[21],
+			//(double)players[p].Land_Made[23],
+			//(double)players[p].Land_Made[24],
+			//(double)players[p].Land_Made[25],//Second Half
+			//(double)players[p].Land_Made[26],
+			//(double)players[p].Land_Made[27],
+			//(double)players[p].Land_Made[28],
+			//(double)players[p].Land_Made[29],
+			////Forth Side: 6
+			//(double)players[p].Land_Made[31],
+			//(double)players[p].Land_Made[32],
+			//(double)players[p].Land_Made[34],
+			//(double)players[p].Land_Made[35],//Second Half
+			//(double)players[p].Land_Made[37],
+			//(double)players[p].Land_Made[39]
+		};
+	}
 	//network[p].feedForward(InputValues);
 	//network[p].getResults(ResultValues);
 	SingleNetwork.feedForward(InputValues);
@@ -328,19 +385,19 @@ void ColourString(std::string& Output) {
 						if (Number < 99 && Number >= 0) { ChangeColour(Number); }
 					}
 				}
-				else if (SBuffer == "[$")				 { SetConsoleTextAttribute(hConsole, 10); }
-				else if (SBuffer == "[-$")				 { SetConsoleTextAttribute(hConsole, 12); }
-				else if (SBuffer == "[Passed GO]")		 { SetConsoleTextAttribute(hConsole,  2); }
-				else if (SBuffer == "[Move to]")		 { SetConsoleTextAttribute(hConsole,  2); }
-				else if (SBuffer == "[Free Pass]")		 { SetConsoleTextAttribute(hConsole,  2); }
-				else if (SBuffer == "[Free Jail Pass]")	 { SetConsoleTextAttribute(hConsole,  2); }
-				else if (SBuffer == "[C:")				 { SetConsoleTextAttribute(hConsole, 10); }
-				else if (SBuffer == "[M:")				 { SetConsoleTextAttribute(hConsole,  4); }
-				else if (SBuffer == "[UM:")				 { SetConsoleTextAttribute(hConsole,  2); }
-				else if (SBuffer == "[SH:")				 { SetConsoleTextAttribute(hConsole,  4); }
-				else if (SBuffer == "[Trade:")			 { SetConsoleTextAttribute(hConsole,112); }
-				else if (SBuffer == "[ERROR:")			 { SetConsoleTextAttribute(hConsole,206); }//224
-				else if (SBuffer == "[R:")				 { SetConsoleTextAttribute(hConsole,  7); }
+				else if (SBuffer == "[$")				 { SetConsoleTextAttribute(hConsole, 10); }	//Gained Money
+				else if (SBuffer == "[-$")				 { SetConsoleTextAttribute(hConsole, 12); }	//Lost Money
+				else if (SBuffer == "[Passed GO]")		 { SetConsoleTextAttribute(hConsole,  2); }	//Passed Go prompt
+				else if (SBuffer == "[Move to]")		 { SetConsoleTextAttribute(hConsole,  2); }	//Move to location prompt
+				else if (SBuffer == "[Free Pass]")		 { SetConsoleTextAttribute(hConsole,  2); }	//Gained a Free Pass prompt
+				else if (SBuffer == "[Free Jail Pass]")	 { SetConsoleTextAttribute(hConsole,  2); }	//Gained a Free Jail Pass prompt
+				else if (SBuffer == "[C:")				 { SetConsoleTextAttribute(hConsole, 10); }	//
+				else if (SBuffer == "[M:")				 { SetConsoleTextAttribute(hConsole,  4); }	//Mortgaging Land 
+				else if (SBuffer == "[UM:")				 { SetConsoleTextAttribute(hConsole,  2); }	//Un-Mortgaging Land
+				else if (SBuffer == "[SH:")				 { SetConsoleTextAttribute(hConsole,  4); }	//Selling House
+				else if (SBuffer == "[Trade:")			 { SetConsoleTextAttribute(hConsole,112); }	//Trading Land
+				else if (SBuffer == "[ERROR:")			 { SetConsoleTextAttribute(hConsole,206); } //224
+				else if (SBuffer == "[R:")				 { SetConsoleTextAttribute(hConsole,  7); }	//Roll number
 
 				//Doubles
 				else if (SBuffer == "[1|1]")			 { SetConsoleTextAttribute(hConsole, 12); }
@@ -423,6 +480,7 @@ void SetPlayerStats(PlayerInfo(&players)[PlayerNum]) {
 
 
 #pragma region other
+//The actions the player can make when playing the game
 enum Action {
 	Waiting,
 	RollDie,
@@ -658,7 +716,7 @@ public:
 	PlayerInfo players[PlayerNum];
 
 	void StartGame(); //PlayerInfo(&players)[PlayerNum]
-	void EndGame();
+	void EndGame(int version2);
 	void AIMove();
 	void PlayerMove(int action, int value1, int value2, std::vector<int> value3, std::vector<int> value4);
 	int RollDice();
@@ -714,7 +772,7 @@ void MonopolyGame::StartGame() {
 	Output = "";
 }
 
-void MonopolyGame::EndGame() {
+void MonopolyGame::EndGame(int version2 = 0) {
 
 
 	CalculateAmountOfHouses(players);
@@ -790,7 +848,7 @@ void MonopolyGame::EndGame() {
 		//Feed the neural network with all the players scores.
 		//If the player was in the top 2, expect best target values.
 		//If in the bottom 2, expect the worst target values.
-		feedForwardAI(players, i);
+		feedForwardAI(players, i, version2);
 		//The 2 last players did good.
 		if (players[i].DiedAt == 0 || players[i].DiedAt == highest) { backPropagationAI(players, i, true); TargetValues = Winning_TargetValues; }
 		else { backPropagationAI(players, i, false); TargetValues = Losing_TargetValues; }
