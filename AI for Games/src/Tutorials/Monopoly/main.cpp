@@ -123,10 +123,25 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("Outfile");
+				CreateExcelFile("10000v2");//Outfile
 			}
 		}
 		else if (game.rolls >= RollsPerGame) {
+			int highest = 0;
+			int second = 0;
+			for (int i = 0; i < PlayerNum; i++) {
+				if (game.players[i].TotalAssetValue > highest) { 
+					second = highest;
+					highest = game.players[i].TotalAssetValue;
+				}
+			}
+			for (int i = 0; i < PlayerNum; i++) {
+				if (game.players[i].TotalAssetValue == highest) { game.players[i].Place = 1; }
+				if (game.players[i].TotalAssetValue == second) { game.players[i].Place = 2; }
+			}
+			for (int i = 0, int ii = PlayerNum; i < PlayerNum; i++) {
+				if (game.players[i].Place == 0) { game.players[i].Place = ii; ii--; }
+			}
 			for (unsigned short int i = 0; i < PlayerNum; i++) { game.players[i].isDead = true; }
 			game.EndGame(AI_Version);
 			games_Finished += 1;
@@ -142,7 +157,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("Outfile");
+				CreateExcelFile("10000v2");//Outfile
 			}
 		}
 	} 

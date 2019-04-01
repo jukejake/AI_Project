@@ -490,6 +490,25 @@ void CreateExcelFile(std::string FileName) {
 	outData.open("../src/Tutorials/Monopoly/Excel/" + FileName + "_Total.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
 	{
 		int TotalGames = Data_Info.Players[0].Place.size();
+		outData << "Player,Times Landed On,Land Stage,Land Wealth,Township Wealth";
+		for (unsigned short int i = 0; i < 41; i++) {
+			outData << "," << StreetNames[i];
+		}
+		outData << std::endl;
+		for (unsigned short int p = 0; p < PlayerNum; p++) {
+			for (unsigned short int i = 0; i < 41; i++) {
+				outData << p;
+				outData << "," << Data_Info.Players[p].Squares[i];
+				outData << "," << Data_Info.Players[p].Land[i];
+				outData << "," << Data_Info.Players[p].Land_Made[i];
+				if (i < 10) { outData << "," << Data_Info.Players[p].Made_iT[i]; }
+				outData << std::endl;
+			}
+			//
+		}
+	}
+	/*{
+		int TotalGames = Data_Info.Players[0].Place.size();
 		outData << "Player,Data";
 		for (unsigned short int i = 0; i < 41; i++) {
 			outData << "," << StreetNames[i];
@@ -517,7 +536,7 @@ void CreateExcelFile(std::string FileName) {
 			}
 			outData << std::endl;
 		}
-	}
+	}*/
 	outData.close();
 
 	outData.open("../src/Tutorials/Monopoly/Excel/"+FileName+"_Individual_Rounds.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
@@ -1167,11 +1186,6 @@ void MonopolyGame::AIMove(int version2 = 0) {
 			if (UpgradePastRound < (rolls / PlayerNum)) { UpgradeTownship(players, p, Output); }
 			if (UnMortgagePastRound < (rolls / PlayerNum)) { UnMortgageProperty(players, p, Output, ResultValues); }
 		}
-
-
-		//What will this do?
-		//feedForwardAI(players, p); ResultValues;
-		//if (Display) { ColourString(Output); }
 	}
 	
 	if (Display) { ColourString(Output); }
@@ -1441,13 +1455,13 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, st
 }
 
 
-
+/*
 bool MonopolyCMD(PlayerInfo(&players)[PlayerNum]) {
-	/*
-		If the Player has to pay another Player money while not on their turn,
-		and falls bellow $0 they will not die until their turn
-		to give them a chance to save themselves.
-	*/
+	///
+	//	If the Player has to pay another Player money while not on their turn,
+	//	and falls bellow $0 they will not die until their turn
+	//	to give them a chance to save themselves.
+	///
 	//Random Numbers
 	std::random_device rd;
 	std::mt19937_64 mt(rd());
@@ -1777,7 +1791,7 @@ void PlayGameInCMD() {
 	std::cout << std::endl << std::endl;
 	if (!Display) { GetData(); }
 }
-
+*/
 
 #pragma endregion
 
