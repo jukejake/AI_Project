@@ -21,6 +21,7 @@
 
 
 /*---------------------------- Variables ----------------------------*/
+
 // GLFW window
 GLFWwindow* window;
 int width = 900;
@@ -71,7 +72,7 @@ MonopolyGame game;
 
 
 void UserInitialize() {
-	/* initialize random seed: */
+	// initialize random seed:
 	srand(time(NULL));
 	//Net blank0(topology);
 	//Net blank1(topology);
@@ -902,3 +903,11 @@ int main()
 }
 
 #pragma endregion
+
+
+
+//void main() {
+//	PlayGameInCMD();
+//	CreateExcelFile("50000");
+//	system("pause");
+//}
