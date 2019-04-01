@@ -139,7 +139,8 @@ void UserUpdate() {
 				if (game.players[i].TotalAssetValue == highest) { game.players[i].Place = 1; }
 				if (game.players[i].TotalAssetValue == second) { game.players[i].Place = 2; }
 			}
-			for (int i = 0, int ii = PlayerNum; i < PlayerNum; i++) {
+			int ii = PlayerNum;
+			for (int i = 0; i < PlayerNum; i++) {
 				if (game.players[i].Place == 0) { game.players[i].Place = ii; ii--; }
 			}
 			for (unsigned short int i = 0; i < PlayerNum; i++) { game.players[i].isDead = true; }
