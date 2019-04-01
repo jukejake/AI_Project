@@ -3,8 +3,7 @@
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp> // for glm::ortho
 
-// IMGUI
-#include <imgui.h>
+#include <imgui.h> // IMGUI
 #include <imgui_impl_glfw_gl3.h>
 #include <vector>
 
@@ -18,6 +17,8 @@
 
 #include "Shaders.h"
 #include "MFunctions.h"
+
+
 
 /*---------------------------- Variables ----------------------------*/
 // GLFW window
@@ -80,10 +81,10 @@ void UserInitialize() {
 	//network[1] = blank1;
 	//network[2] = blank2;
 	//network[3] = blank3;
-	
+
 	Net blank4(topology);
 	SingleNetwork = blank4;
-	
+
 	//initialize Starting values
 	for (int i = 0; i < PlayerNum; i++) {
 		Data_Player Temp;
@@ -95,6 +96,9 @@ void UserInitialize() {
 	//Display at the end
 	//std::cout << std::endl << std::endl;
 	//if (!Display) { GetData(); }
+
+
+
 }
 
 void UserUpdate() {
@@ -118,6 +122,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
+				CreateExcelFile("Outfile");
 			}
 		}
 		else if (game.rolls >= RollsPerGame) {
@@ -136,6 +141,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
+				CreateExcelFile("Outfile");
 			}
 		}
 	} 

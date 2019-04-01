@@ -12,6 +12,12 @@
 #include "MTrade.h"
 #include "Net.h"
 
+//Excel
+#include <fstream>
+#include <string>
+//#include <iomanip>
+//#include <iostream>
+
 HANDLE  hConsole;
 Data Data_Info;
 
@@ -468,12 +474,77 @@ void SetPlayerStats(PlayerInfo(&players)[PlayerNum]) {
 
 		players[p].isDead = false;
 		players[p].DiedAt = 0;
+		players[p].Place = 0;
 
 		players[p].Land_Made = { 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0 };
 		for (int i = 0; i < 10; i++) { players[p].Made_iT[i] = 0; }
 	}
 
 	for (int i = 0; i < 40; i++) { Data_Info.LandOwnerShip[i] = -1; }
+}
+
+void CreateExcelFile(std::string FileName) {
+	Data_Info;
+	std::ofstream outData;
+	outData.open("../src/Tutorials/Monopoly/Excel/"+FileName+"_Individual_Rounds.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
+	{
+		int TotalGames = Data_Info.Players[0].Place.size();
+		outData << "Player"
+			<< ", Place"
+			<< ", Died At"
+			<< ", Times Around Board"
+			<< ", Money"
+			<< ", Total Asset Value"
+			<< ", Houses"
+			<< ", Hotels"
+			<< std::endl;
+		for (unsigned short int p = 0; p < PlayerNum; p++) {
+			for (unsigned short int i = 0; i < TotalGames; i++) {
+				outData << p
+					<< "," << Data_Info.Players[p].Place[i]
+					<< "," << Data_Info.Players[p].DiedAt[i]
+					<< "," << Data_Info.Players[p].TimesAroundBoard[i]
+					<< "," << Data_Info.Players[p].Money[i]
+					<< "," << Data_Info.Players[p].AssetValue[i]
+					<< "," << Data_Info.Players[p].Houses[i]
+					<< "," << Data_Info.Players[p].Hotels[i]
+					<< std::endl;
+			}
+		}
+	}
+	outData.close();
+	outData.open("../src/Tutorials/Monopoly/Excel/" + FileName + "_Averages.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
+	{
+		int TotalGames = Data_Info.Players[0].Place.size();
+		outData << "Player,Data";
+		for (unsigned short int i = 0; i < 41; i++) {
+			outData << "," << StreetNames[i];
+		}
+		outData << std::endl;
+		for (unsigned short int p = 0; p < PlayerNum; p++) {
+			outData << p << ",Times Landed On";
+			for (unsigned short int i = 0; i < 41; i++) {
+				outData << "," << Data_Info.Players[p].Squares[i];
+			}
+			outData << std::endl;
+			outData << p << ",Land Stage";
+			for (unsigned short int i = 0; i < 41; i++) {
+				outData << "," << Data_Info.Players[p].Land[i];
+			}
+			outData << std::endl;
+			outData << p << ",Land Wealth";
+			for (unsigned short int i = 0; i < 41; i++) {
+				outData << "," << Data_Info.Players[p].Land_Made[i];
+			}
+			outData << std::endl;
+			outData << p << ",Township Wealth";
+			for (unsigned short int i = 0; i < 10; i++) {
+				outData << "," << Data_Info.Players[p].Made_iT[i];
+			}
+			outData << std::endl;
+		}
+	}
+	outData.close();
 }
 
 #pragma endregion
@@ -717,7 +788,7 @@ public:
 
 	void StartGame(); //PlayerInfo(&players)[PlayerNum]
 	void EndGame(int version2);
-	void AIMove();
+	void AIMove(int version2);
 	void PlayerMove(int action, int value1, int value2, std::vector<int> value3, std::vector<int> value4);
 	int RollDice();
 	void MonopolyShowMe(int p);
@@ -784,7 +855,7 @@ void MonopolyGame::EndGame(int version2 = 0) {
 	for (int p = 0; p < PlayerNum; p++) {
 		if (!players[p].isDead) {
 			players[p].DiedAt = (int)(rolls / PlayerNum);
-			Data_Info.Players[p].Place.push_back(1);
+			players[p].Place = (PlayerNum - AmountDead);
 
 			if (DisplaySpecificRounds) {
 				//Show Certain Rounds. Specific 
@@ -828,6 +899,7 @@ void MonopolyGame::EndGame(int version2 = 0) {
 		Data_Info.Players[i].LocationsLandedOn.push_back(players[i].TotalLocationsLandedOn);
 		Data_Info.Players[i].TimesAroundBoard.push_back(players[i].TimesAroundBoard);
 		Data_Info.Players[i].DiedAt.push_back(players[i].DiedAt);
+		Data_Info.Players[i].Place.push_back(players[i].Place);
 
 		for (unsigned int j = 0; j < 41; j++) {
 			Data_Info.Players[i].Squares[j] += players[i].Squares[j];
@@ -878,13 +950,13 @@ void MonopolyGame::MonopolyShowMe(int p) {
 		<< ResultValues[6] << ", " << ResultValues[7] << ", " << ResultValues[8] << ", " << ResultValues[9] << ", " << ResultValues[10] << std::endl;
 }
 
-void MonopolyGame::AIMove() {
+void MonopolyGame::AIMove(int version2 = 0) {
 
 	Output = "";
 	int p = CurrentPlayer;
 
 	if (!players[p].isDead) {
-		feedForwardAI(players, p);
+		feedForwardAI(players, p, version2);
 		SingleNetwork.getResults(ResultValues);
 
 		if (Display) {
@@ -1076,7 +1148,7 @@ void MonopolyGame::AIMove() {
 		int PlayerState = IsDead(players, p, Output);
 		if (PlayerState == 2) {
 			//Lost
-			Data_Info.Players[p].Place.push_back(PlayerNum - AmountDead);
+			players[p].Place = (PlayerNum - AmountDead);
 			players[p].isDead = true;
 			players[p].DiedAt = (rolls / PlayerNum);
 			AmountDead += 1;
@@ -1337,7 +1409,7 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, st
 			//Player is Dead
 			if (IsDead(players, p, Output) == 2) {
 				//Lost
-				Data_Info.Players[p].Place.push_back(PlayerNum - AmountDead);
+				players[p].Place = (PlayerNum - AmountDead);
 				players[p].isDead = true;
 				players[p].DiedAt = (rolls / PlayerNum);
 				AmountDead += 1;

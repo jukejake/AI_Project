@@ -18,7 +18,7 @@ const int UnMortgagePastRound = 5;
 const bool FreeParkingRule = true;
 const int JailFee = 50;
 const int RollsPerGame = 800; //Total rolls per game
-const int Games = 5000; //Total amount of games
+const int Games = 500; //Total amount of games
 const int PlayerNum = 4;
 //Names of all Streets in order
 const std::string StreetColour[] = { "Brown","Light Blue","Pink","Orange","Red","Yellow","Green","Blue","Utilities","Railroads"," " };
@@ -119,6 +119,7 @@ struct PlayerInfo {
 
 	bool isDead = false;
 	unsigned int DiedAt = 0;
+	unsigned int Place = 0;
 
 	int FirstDice = 0;
 	int SecondDice = 0;
