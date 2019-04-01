@@ -489,18 +489,18 @@ void CreateExcelFile(std::string FileName) {
 	outData.open("../src/Tutorials/Monopoly/Excel/"+FileName+"_Individual_Rounds.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
 	{
 		int TotalGames = Data_Info.Players[0].Place.size();
-		outData << "Player"
-			<< ", Place"
-			<< ", Died At"
-			<< ", Times Around Board"
-			<< ", Money"
-			<< ", Total Asset Value"
-			<< ", Houses"
-			<< ", Hotels"
+		outData << "Player" << ",Game"
+			<< ",Place"
+			<< ",Died At"
+			<< ",Times Around Board"
+			<< ",Money"
+			<< ",Total Asset Value"
+			<< ",Houses"
+			<< ",Hotels"
 			<< std::endl;
 		for (unsigned short int p = 0; p < PlayerNum; p++) {
 			for (unsigned short int i = 0; i < TotalGames; i++) {
-				outData << p
+				outData << p << "," << i
 					<< "," << Data_Info.Players[p].Place[i]
 					<< "," << Data_Info.Players[p].DiedAt[i]
 					<< "," << Data_Info.Players[p].TimesAroundBoard[i]
@@ -513,7 +513,7 @@ void CreateExcelFile(std::string FileName) {
 		}
 	}
 	outData.close();
-	outData.open("../src/Tutorials/Monopoly/Excel/" + FileName + "_Averages.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
+	outData.open("../src/Tutorials/Monopoly/Excel/" + FileName + "_Total.csv", std::ofstream::out | std::ofstream::trunc); // std::ios::app|
 	{
 		int TotalGames = Data_Info.Players[0].Place.size();
 		outData << "Player,Data";
