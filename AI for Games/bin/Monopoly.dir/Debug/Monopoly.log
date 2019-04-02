@@ -27,20 +27,20 @@ c:\github\ai_project\ai for games\src\tutorials\monopoly\mtrade.h(452): warning 
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(133): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(178): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(187): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(491): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(518): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(864): warning C4018: '<': signed/unsigned mismatch
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(866): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(890): warning C4018: '>': signed/unsigned mismatch
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(963): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1207): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(75): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(492): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(884): warning C4018: '<': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(886): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(910): warning C4018: '>': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(983): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1222): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(76): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(133): warning C4018: '>': signed/unsigned mismatch
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mconstants.h(180): warning C4244: 'initializing': conversion from 'float' to 'T', possible loss of data
           with
           [
               T=int
           ]
-  c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(248): note: see reference to function template instantiation 'T GetAverageVector<int>(std::vector<int,std::allocator<_Ty>>)' being compiled
+  c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(249): note: see reference to function template instantiation 'T GetAverageVector<int>(std::vector<int,std::allocator<_Ty>>)' being compiled
           with
           [
               T=int,
@@ -51,6 +51,7 @@ c:\github\ai_project\ai for games\src\tutorials\monopoly\mconstants.h(182): warn
           [
               T=int
           ]
+  LINK : C:\Github\AI_Project\AI for Games\bin\Builds\Tutorials\Monopoly\Debug\Monopoly_debug.exe not found or not built by the last incremental link; performing full link
   Monopoly.vcxproj -> C:\Github\AI_Project\AI for Games\bin\Builds\Tutorials\Monopoly\Debug\Monopoly_debug.exe
   
   
