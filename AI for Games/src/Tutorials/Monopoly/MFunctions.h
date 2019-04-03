@@ -448,7 +448,7 @@ void SetPlayerStats(PlayerInfo(&players)[PlayerNum]) {
 		players[p].Doubles = 0;		 //Amount of doubles in a row
 		players[p].InJail = 0;		 //Amount of turns the player is in jail for (3, 2, 1, 0)
 		players[p].JailPass = 0;	 //Amount of (get out of jail free) passes
-		players[p].Money = 1500;
+		players[p].Money = 1500 + (p*200); //TESTING
 		//Data 
 		//Land the player owns and the stage it is at
 		players[p].Land = {

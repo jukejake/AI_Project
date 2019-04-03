@@ -123,7 +123,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("10000_AI");//Outfile
+				CreateExcelFile("10000v2_AI");//Outfile
 			}
 		}
 		else if (game.rolls >= RollsPerGame) {
@@ -185,7 +185,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("10000_AI");//Outfile
+				CreateExcelFile("10000v2_AI");//Outfile
 			}
 		}
 	} 

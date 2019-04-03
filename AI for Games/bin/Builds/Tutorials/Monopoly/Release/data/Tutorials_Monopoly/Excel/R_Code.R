@@ -1,3 +1,10 @@
+if (!require(dplyr)) install.packages("dplyr")
+library(dplyr)
+if (!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+if(!require(Rcmdr)) install.packages("Rcmdr")
+library(Rcmdr)
+
 #Monopoly Data Total
 MDT <- read.csv("10000_AI_Total.csv")
 MDT_No_AI <- read.csv("10000_No_AI_Total.csv")
@@ -11,16 +18,10 @@ summary(MDT)
 #Summary of Monopoly Data Individual Rounds
 summary(MDI)
 
-if (!require(dplyr)) install.packages("dplyr")
-library(dplyr)
-
 p1 <- filter(MDI, Player == 0)
 p2 <- filter(MDI, Player == 1)
 p3 <- filter(MDI, Player == 2)
 p4 <- filter(MDI, Player == 3)
-
-if (!require(ggplot2)) install.packages("ggplot2")
-library(ggplot2)
 
 #plot(MDI)
 hist(MDI$Times.Around.Board)
@@ -44,25 +45,101 @@ MDI %>% filter(MDI$Game > 500) %>%
   ggplot(aes(x=Game, y=Died.At, col=Place, size=Total.Asset.Value))+
   geom_point(alpha = 0.3)+geom_smooth(method = lm)+facet_wrap(~Player)
 
-#Check stuff
-df1 <- MDI %>% filter(MDI$Game < 300) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
-t.test(data = df1, Died.At ~ (Player == 0 | Player == 1))
-df1 <- MDI %>% filter(MDI$Game > 300, MDI$Game < 1000) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
-t.test(data = df1, Died.At ~ (Player == 0 | Player == 1))
-df1 <- MDI %>% filter(MDI$Game > 1000) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
-t.test(data = df1, Died.At ~ (Player == 0 | Player == 1))
 
-df1 <- MDI %>% filter(MDI$Place == 1) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
+PSum <- data.frame(
+  "Player" = 1:4, 
+  "First" = c(
+    sum(MDI$Player == 0 & MDI$Place == 1),
+    sum(MDI$Player == 1 & MDI$Place == 1),
+    sum(MDI$Player == 2 & MDI$Place == 1),
+    sum(MDI$Player == 3 & MDI$Place == 1) ),
+  "Second" = c(
+    sum(MDI$Player == 0 & MDI$Place == 2),
+    sum(MDI$Player == 1 & MDI$Place == 2),
+    sum(MDI$Player == 2 & MDI$Place == 2),
+    sum(MDI$Player == 3 & MDI$Place == 2) ),
+  "Third" = c(
+    sum(MDI$Player == 0 & MDI$Place == 3),
+    sum(MDI$Player == 1 & MDI$Place == 3),
+    sum(MDI$Player == 2 & MDI$Place == 3),
+    sum(MDI$Player == 3 & MDI$Place == 3) ),
+  "Forth" = c(
+    sum(MDI$Player == 0 & MDI$Place == 4),
+    sum(MDI$Player == 1 & MDI$Place == 4),
+    sum(MDI$Player == 2 & MDI$Place == 4),
+    sum(MDI$Player == 3 & MDI$Place == 4) )
+)
+PSum2 <- data.frame(
+  "Place" = 1:4, 
+  "First" = c(
+    sum(MDI$Player == 0 & MDI$Place == 1),
+    sum(MDI$Player == 0 & MDI$Place == 2),
+    sum(MDI$Player == 0 & MDI$Place == 3),
+    sum(MDI$Player == 0 & MDI$Place == 4) ),
+  "Second" = c(
+    sum(MDI$Player == 1 & MDI$Place == 1),
+    sum(MDI$Player == 1 & MDI$Place == 2),
+    sum(MDI$Player == 1 & MDI$Place == 3),
+    sum(MDI$Player == 1 & MDI$Place == 4) ),
+  "Third" = c(
+    sum(MDI$Player == 2 & MDI$Place == 1),
+    sum(MDI$Player == 2 & MDI$Place == 2),
+    sum(MDI$Player == 2 & MDI$Place == 3),
+    sum(MDI$Player == 2 & MDI$Place == 4) ),
+  "Forth" = c(
+    sum(MDI$Player == 3 & MDI$Place == 1),
+    sum(MDI$Player == 3 & MDI$Place == 2),
+    sum(MDI$Player == 3 & MDI$Place == 3),
+    sum(MDI$Player == 3 & MDI$Place == 4) )
+)
+PSum_No_AI <- data.frame(
+  "Player" = 1:4, 
+  "First" = c(
+    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 1),
+    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 1),
+    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 1),
+    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 1) ),
+  "Second" = c(
+    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 2),
+    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 2),
+    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 2),
+    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 2) ),
+  "Third" = c(
+    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 3),
+    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 3),
+    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 3),
+    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 3) ),
+  "Forth" = c(
+    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 4),
+    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 4),
+    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 4),
+    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 4) )
+)
+PSum
+PSum_No_AI
+summary(PSum)
+summary(PSum_No_AI)
+
+t.test(data = PSum, First ~ (Player == 1 | Player == 4))#Almost a significant difference
+t.test(data = PSum, Third ~ (Player == 1 | Player == 4))#A significant difference
+#Everything else was good
+
+shapiro.test(PSum$First)  # passed normality test
+shapiro.test(PSum$Second) # just passed normality test
+shapiro.test(PSum$Third)  # passed normality test
+shapiro.test(PSum$Forth)  # passed normality test
+
+bartlett.test(PSum) # not homogenous
+
+anovaRes <- aov(PSum2$First~PSum2$Place)  #A significant difference
+summary(anovaRes)
+anovaRes <- aov(PSum2$Second~PSum2$Place) #Not a significant difference
+summary(anovaRes)
+anovaRes <- aov(PSum2$Third~PSum2$Place)  #Not a significant difference
+summary(anovaRes)
+anovaRes <- aov(PSum2$Forth~PSum2$Place)  #A significant difference
+summary(anovaRes)
 
 
-for (i in 0:3) {
-  print(sum(MDI$Player == i & MDI$Place == 1))
-}
-for (i in 0:3) {
-  print(sum(MDI_No_AI$Player == i & MDI_No_AI$Place == 1))
-}
-#t.test(MDI$Died.At ~ MDI$Place) #, paired = F, var.equal = T)
-#t.test(data = MDI, Died.At ~ Place)
-#t.test(data = MDI, Died.At ~ (Player == 0 | Player == 1))
 
 
