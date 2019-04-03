@@ -871,8 +871,11 @@ void MonopolyGame::EndGame(int version2 = 0) {
 	//Last player Alive
 	for (int p = 0; p < PlayerNum; p++) {
 		if (!players[p].isDead) {
-			players[p].DiedAt = (int)(rolls / PlayerNum);
-			players[p].Place = (PlayerNum - AmountDead);
+			
+			if (players[p].Place == 0) { 
+				players[p].DiedAt = (int)(rolls / PlayerNum);
+				players[p].Place = (PlayerNum - AmountDead);
+			}
 
 			if (DisplaySpecificRounds) {
 				//Show Certain Rounds. Specific 
@@ -1452,7 +1455,7 @@ void MonopolyGame::PlayerMove(int action = 0, int value1 = 0, int value2 = 0, st
 }
 
 
-/*
+
 bool MonopolyCMD(PlayerInfo(&players)[PlayerNum]) {
 	///
 	//	If the Player has to pay another Player money while not on their turn,
@@ -1710,31 +1713,61 @@ bool MonopolyCMD(PlayerInfo(&players)[PlayerNum]) {
 
 	Data_Info.Rolls.push_back((rolls / PlayerNum));
 
-	//Last player Alive
+	int HowManyAlive = 0;
 	for (int p = 0; p < PlayerNum; p++) {
-		if (!players[p].isDead) {
-			players[p].DiedAt = (int)(rolls / PlayerNum);
-			players[p].Place = (PlayerNum - AmountDead);
+		if (!players[p].isDead) { HowManyAlive++; }
+	}
+	if (HowManyAlive == 1) {
+		//Last player Alive
+		for (int p = 0; p < PlayerNum; p++) {
+			if (!players[p].isDead) {
+				players[p].DiedAt = (int)(rolls / PlayerNum);
+				players[p].Place = (PlayerNum - AmountDead);
 
-			if (DisplaySpecificRounds) {
-				//Show Certain Rounds. Specific 
-				if (players[p].DiedAt == SpecificRound) {
-					int i = 0;
-					while (i < (players[p].DiedAt*PlayerNum)) {
-						for (int pp = 0; pp < PlayerNum; pp++) {
-							COORD xy = { (pp * x), y };
-							SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), xy);
-							if (pp == PlayerNum - 1) { y += 1; }
-							ColourString(StuffAndThings[i]);
-							i++;
+				if (DisplaySpecificRounds) {
+					//Show Certain Rounds. Specific 
+					if (players[p].DiedAt == SpecificRound) {
+						int i = 0;
+						while (i < (players[p].DiedAt*PlayerNum)) {
+							for (int pp = 0; pp < PlayerNum; pp++) {
+								COORD xy = { (pp * x), y };
+								SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), xy);
+								if (pp == PlayerNum - 1) { y += 1; }
+								ColourString(StuffAndThings[i]);
+								i++;
+							}
 						}
+						DisplayStats(players, y);
 					}
-					DisplayStats(players, y);
+					//StuffAndThings.clear();
 				}
-				//StuffAndThings.clear();
 			}
 		}
 	}
+	else if (HowManyAlive > 1) {
+		int highest = 0;
+		int second = 0;
+		int third = 0;
+		int forth = 0;
+		for (int i = 0; i < PlayerNum; i++) {
+			if (players[i].TotalAssetValue > highest) {
+				forth = third;
+				third = second;
+				second = highest;
+				highest = players[i].TotalAssetValue;
+			}
+		}
+		for (int i = 0; i < PlayerNum; i++) {
+			if (players[i].Place == 0) {
+					 if (players[i].TotalAssetValue == highest)	 { players[i].Place = 1; }
+				else if (players[i].TotalAssetValue == second)	 { players[i].Place = 2; }
+				else if (players[i].TotalAssetValue == third)	 { players[i].Place = 3; }
+				else if (players[i].TotalAssetValue == forth)	 { players[i].Place = 4; }
+				players[i].DiedAt = (int)(rolls / PlayerNum);
+			}
+		}
+	}
+	
 	StuffAndThings.clear();
 
 	for (int i = 0; i < PlayerNum; i++) {
@@ -1788,7 +1821,7 @@ void PlayGameInCMD() {
 	std::cout << std::endl << std::endl;
 	if (!Display) { GetData(); }
 }
-*/
+
 
 #pragma endregion
 

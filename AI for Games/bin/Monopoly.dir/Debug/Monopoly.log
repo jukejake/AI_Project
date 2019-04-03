@@ -33,8 +33,12 @@ c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(886): warn
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(910): warning C4018: '>': signed/unsigned mismatch
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(983): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1222): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1490): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1500): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1726): warning C4018: '<': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1728): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
 c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(76): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(133): warning C4018: '>': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(137): warning C4018: '>': signed/unsigned mismatch
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mconstants.h(180): warning C4244: 'initializing': conversion from 'float' to 'T', possible loss of data
           with
           [
@@ -51,7 +55,6 @@ c:\github\ai_project\ai for games\src\tutorials\monopoly\mconstants.h(182): warn
           [
               T=int
           ]
-  LINK : C:\Github\AI_Project\AI for Games\bin\Builds\Tutorials\Monopoly\Debug\Monopoly_debug.exe not found or not built by the last incremental link; performing full link
   Monopoly.vcxproj -> C:\Github\AI_Project\AI for Games\bin\Builds\Tutorials\Monopoly\Debug\Monopoly_debug.exe
   
   

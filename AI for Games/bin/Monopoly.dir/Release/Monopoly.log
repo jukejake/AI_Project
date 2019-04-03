@@ -28,13 +28,18 @@ c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(133): warning C42
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(178): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\net.h(187): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(492): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(881): warning C4018: '<': signed/unsigned mismatch
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(883): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(907): warning C4018: '>': signed/unsigned mismatch
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(980): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1219): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(884): warning C4018: '<': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(886): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(910): warning C4018: '>': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(983): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1222): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1490): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1500): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1731): warning C4018: '<': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1733): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\github\ai_project\ai for games\src\tutorials\monopoly\mfunctions.h(1753): warning C4018: '>': signed/unsigned mismatch
 c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(76): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(133): warning C4018: '>': signed/unsigned mismatch
+c:\github\ai_project\ai for games\src\tutorials\monopoly\main.cpp(137): warning C4018: '>': signed/unsigned mismatch
 c:\github\ai_project\ai for games\src\tutorials\monopoly\mconstants.h(180): warning C4244: 'initializing': conversion from 'float' to 'T', possible loss of data
           with
           [

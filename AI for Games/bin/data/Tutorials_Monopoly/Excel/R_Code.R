@@ -1,7 +1,9 @@
 #Monopoly Data Total
-MDT <- read.csv("10000_Total.csv")
+MDT <- read.csv("10000v3_Total.csv")
+MDT_No_AI <- read.csv("10000_No_AI_Total.csv")
 #Monopoly Data Individual Rounds
-MDI <- read.csv("10000_Individual_Rounds.csv")
+MDI <- read.csv("10000v3_Individual_Rounds.csv")
+MDI_No_AI <- read.csv("10000_No_AI_Individual_Rounds.csv")
 
 #Summary of Monopoly Total
 #The data needs to be rearranged as is doesn't give good results 
@@ -37,13 +39,33 @@ boxplot(data = MDI, Hotels~Player, ylab = "Hotels", xlab = "Player")
 boxplot(data = MDI, Houses~Player, ylab = "Houses", xlab = "Player")
 #boxplot(data = MDI, Money~Player, ylab = "Money", xlab = "Player")
 
+#Plot some stuff
 MDI %>% filter(MDI$Game > 500) %>% 
   ggplot(aes(x=Game, y=Died.At, col=Place, size=Total.Asset.Value))+
   geom_point(alpha = 0.3)+geom_smooth(method = lm)+facet_wrap(~Player)
 
-#df1 <- MDI %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
+#Check stuff
+df1 <- MDI %>% filter(MDI$Game < 300) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
+t.test(data = df1, Died.At ~ (Player == 0 | Player == 1))
+df1 <- MDI %>% filter(MDI$Game > 300, MDI$Game < 1000) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
+t.test(data = df1, Died.At ~ (Player == 0 | Player == 1))
+df1 <- MDI %>% filter(MDI$Game > 1000) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
+t.test(data = df1, Died.At ~ (Player == 0 | Player == 1))
+
+df1 <- MDI %>% filter(MDI$Place == 1) %>% dplyr::select(Player, Place, Died.At, Total.Asset.Value)
+
+PlaceSum = 0
+for (i in 0:3) {
+  PlaceSum = PlaceSum + (sum(MDI$Player == i & MDI$Place == 1))
+}
+PlaceSum
+PlaceSum = 0
+for (i in 0:3) {
+  PlaceSum = PlaceSum + (sum(MDI_No_AI$Player == i & MDI_No_AI$Place == 1))
+}
+PlaceSum
 #t.test(MDI$Died.At ~ MDI$Place) #, paired = F, var.equal = T)
 #t.test(data = MDI, Died.At ~ Place)
-t.test(data = MDI, Died.At ~ (Player == 0 | Player == 1))
+#t.test(data = MDI, Died.At ~ (Player == 0 | Player == 1))
 
 

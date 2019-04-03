@@ -123,25 +123,32 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("10000v4");//Outfile
+				CreateExcelFile("10000_AI");//Outfile
 			}
 		}
 		else if (game.rolls >= RollsPerGame) {
+			CalculateAmountOfHouses(game.players);
+			CalculateTotalAssetValue(game.players);
 			int highest = 0;
 			int second = 0;
+			int third = 0;
+			int forth = 0;
 			for (int i = 0; i < PlayerNum; i++) {
 				if (game.players[i].TotalAssetValue > highest) { 
+					forth = third;
+					third = second;
 					second = highest;
 					highest = game.players[i].TotalAssetValue;
 				}
 			}
 			for (int i = 0; i < PlayerNum; i++) {
-					 if (game.players[i].TotalAssetValue == highest) { game.players[i].Place = 1; }
-				else if (game.players[i].TotalAssetValue == second)  { game.players[i].Place = 2; }
-			}
-			int ii = PlayerNum;
-			for (int i = 0; i < PlayerNum; i++) {
-				if (game.players[i].Place == 0) { game.players[i].Place = ii; ii--; }
+				if (game.players[i].Place == 0) {
+						 if (game.players[i].TotalAssetValue == highest) { game.players[i].Place = 1; }
+					else if (game.players[i].TotalAssetValue == second)	 { game.players[i].Place = 2; }
+					else if (game.players[i].TotalAssetValue == third)	 { game.players[i].Place = 3; }
+					else if (game.players[i].TotalAssetValue == forth)	 { game.players[i].Place = 4; }
+					game.players[i].DiedAt = (int)(game.rolls / PlayerNum);
+				}
 			}
 			for (unsigned short int i = 0; i < PlayerNum; i++) { game.players[i].isDead = true; }
 			game.EndGame(AI_Version);
@@ -158,7 +165,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("10000v4");//Outfile
+				CreateExcelFile("10000_AI");//Outfile
 			}
 		}
 	} 
@@ -847,7 +854,7 @@ static void ResizeEvent(GLFWwindow* a_window, int a_width, int a_height)
 	glViewport(0, 0, width, height);
 }
 
-int main()
+int main11()
 {
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit())
@@ -922,8 +929,8 @@ int main()
 
 
 
-//void main() {
-//	PlayGameInCMD();
-//	CreateExcelFile("50000");
-//	system("pause");
-//}
+void main() {
+	PlayGameInCMD();
+	CreateExcelFile("10000_No_AI");
+	system("pause");
+}
