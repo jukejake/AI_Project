@@ -66,3 +66,33 @@ for (i in 0:3) {
 #t.test(data = MDI, Died.At ~ (Player == 0 | Player == 1))
 
 
+PlaceSum <- data.frame(
+  "Player" = 1:4, 
+  "First.Place" = c(
+    sum(MDI$Player == 0 & MDI$Place == 1),
+    sum(MDI$Player == 1 & MDI$Place == 1),
+    sum(MDI$Player == 2 & MDI$Place == 1),
+    sum(MDI$Player == 3 & MDI$Place == 1)
+    ),
+  "Second.Place" = c(
+    sum(MDI$Player == 0 & MDI$Place == 2),
+    sum(MDI$Player == 1 & MDI$Place == 2),
+    sum(MDI$Player == 2 & MDI$Place == 2),
+    sum(MDI$Player == 3 & MDI$Place == 2)
+  ),
+  "Third.Place" = c(
+    sum(MDI$Player == 0 & MDI$Place == 3),
+    sum(MDI$Player == 1 & MDI$Place == 3),
+    sum(MDI$Player == 2 & MDI$Place == 3),
+    sum(MDI$Player == 3 & MDI$Place == 3)
+  ),
+  "Forth.Place" = c(
+    sum(MDI$Player == 0 & MDI$Place == 4),
+    sum(MDI$Player == 1 & MDI$Place == 4),
+    sum(MDI$Player == 2 & MDI$Place == 4),
+    sum(MDI$Player == 3 & MDI$Place == 4)
+  )
+)
+
+
+

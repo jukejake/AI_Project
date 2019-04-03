@@ -1758,6 +1758,24 @@ bool MonopolyCMD(PlayerInfo(&players)[PlayerNum]) {
 			}
 		}
 		for (int i = 0; i < PlayerNum; i++) {
+			if (players[i].TotalAssetValue < highest && players[i].TotalAssetValue > second) {
+				forth = third;
+				third = second;
+				second = players[i].TotalAssetValue;
+			}
+		}
+		for (int i = 0; i < PlayerNum; i++) {
+			if (players[i].TotalAssetValue < second && players[i].TotalAssetValue > third) {
+				forth = third;
+				third = players[i].TotalAssetValue;
+			}
+		}
+		for (int i = 0; i < PlayerNum; i++) {
+			if (players[i].TotalAssetValue < third && players[i].TotalAssetValue > forth) {
+				forth = players[i].TotalAssetValue;
+			}
+		}
+		for (int i = 0; i < PlayerNum; i++) {
 			if (players[i].Place == 0) {
 					 if (players[i].TotalAssetValue == highest)	 { players[i].Place = 1; }
 				else if (players[i].TotalAssetValue == second)	 { players[i].Place = 2; }
