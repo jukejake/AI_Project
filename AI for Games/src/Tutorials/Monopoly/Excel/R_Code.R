@@ -8,21 +8,30 @@ library(Rcmdr)
 #Monopoly Data Total
 MDT <- read.csv("10000_AI_Total.csv")
 MDT2 <- read.csv("10000v2_AI_Total.csv")
+MDT3 <- read.csv("10000v3_AI_Total.csv")
+MDT4 <- read.csv("10000v4_AI_Total.csv")
 MDT_No_AI <- read.csv("10000_No_AI_Total.csv")
 #Monopoly Data Individual Rounds
 MDI <- read.csv("10000_AI_Individual_Rounds.csv")
 MDI2 <- read.csv("10000v2_AI_Individual_Rounds.csv")
+MDI3 <- read.csv("10000v3_AI_Individual_Rounds.csv")
+MDI4 <- read.csv("10000v4_AI_Individual_Rounds.csv")
 MDI_No_AI <- read.csv("10000_No_AI_Individual_Rounds.csv")
 
-#Summary of Monopoly Total
-summary(MDT)
-#Summary of Monopoly Data Individual Rounds
-summary(MDI)
 
 p1 <- filter(MDI, Player == 0)
 p2 <- filter(MDI, Player == 1)
 p3 <- filter(MDI, Player == 2)
 p4 <- filter(MDI, Player == 3)
+
+#Summary of Monopoly Total
+summary(MDT)
+#Summary of Monopoly Data Individual Rounds
+summary(MDI)
+#summary(p1)
+#summary(p2)
+#summary(p3)
+#summary(p4)
 
 #plot(MDI)
 hist(MDI$Times.Around.Board)
@@ -40,10 +49,15 @@ boxplot(data = MDI, Total.Asset.Value~Player, ylab = "Total Asset Value", xlab =
 boxplot(data = MDI, Hotels~Player, ylab = "Hotels", xlab = "Player")
 boxplot(data = MDI, Houses~Player, ylab = "Houses", xlab = "Player")
 #boxplot(data = MDI, Money~Player, ylab = "Money", xlab = "Player")
+par(mfrow=c(1,1))
 
 #Plot some stuff
 MDI %>% filter(MDI$Game > 500) %>% 
   ggplot(aes(x=Game, y=Died.At, col=Place, size=Total.Asset.Value))+
+  geom_point(alpha = 0.3)+geom_smooth(method = lm)+facet_wrap(~Player)
+
+MDI %>% 
+  ggplot(aes(x=Times.Around.Board, y=Total.Asset.Value, col=Place))+
   geom_point(alpha = 0.3)+geom_smooth(method = lm)+facet_wrap(~Player)
 
 GetSumByPlayer <- function(data){
@@ -101,17 +115,18 @@ GetSumByPlace <- function(data){
 
 PlayerSum <- GetSumByPlayer(MDI)
 PlayerSum2 <- GetSumByPlayer(MDI2)
+PlayerSum3 <- GetSumByPlayer(MDI3)
+PlayerSum_No_AI <- GetSumByPlayer(MDI_No_AI)
 PlaceSum <- GetSumByPlace(MDI)
 PlaceSum2 <- GetSumByPlace(MDI2)
+PlaceSum3 <- GetSumByPlace(MDI3)
+PlaceSum_No_AI <- GetSumByPlayer(MDI_No_AI)
 
-#PlayerSum
-#PlayerSum2
-#PlaceSum
-#PlaceSum2
-#summary(PlayerSum)
-#summary(PlayerSum2)
-#summary(PlaceSum)
-#summary(PlaceSum2)
+PlayerSum
+PlayerSum2
+PlayerSum3
+PlayerSum_No_AI
+
 
 t.test(data = PlayerSum,  First ~ (Value == 1 | Value == 4))#Almost a significant difference
 t.test(data = PlayerSum2, First ~ (Value == 1 | Value == 4))#Not a significant difference

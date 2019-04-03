@@ -7,13 +7,16 @@ library(Rcmdr)
 
 #Monopoly Data Total
 MDT <- read.csv("10000_AI_Total.csv")
+MDT2 <- read.csv("10000v2_AI_Total.csv")
+MDT3 <- read.csv("10000v3_AI_Total.csv")
 MDT_No_AI <- read.csv("10000_No_AI_Total.csv")
 #Monopoly Data Individual Rounds
 MDI <- read.csv("10000_AI_Individual_Rounds.csv")
+MDI2 <- read.csv("10000v2_AI_Individual_Rounds.csv")
+MDI3 <- read.csv("10000v3_AI_Individual_Rounds.csv")
 MDI_No_AI <- read.csv("10000_No_AI_Individual_Rounds.csv")
 
 #Summary of Monopoly Total
-#The data needs to be rearranged as is doesn't give good results 
 summary(MDT)
 #Summary of Monopoly Data Individual Rounds
 summary(MDI)
@@ -45,101 +48,124 @@ MDI %>% filter(MDI$Game > 500) %>%
   ggplot(aes(x=Game, y=Died.At, col=Place, size=Total.Asset.Value))+
   geom_point(alpha = 0.3)+geom_smooth(method = lm)+facet_wrap(~Player)
 
+GetSumByPlayer <- function(data){
+  result <- data.frame(
+    "Value" = 1:4, 
+    "First" = c(
+      sum(data$Player == 0 & data$Place == 1),
+      sum(data$Player == 1 & data$Place == 1),
+      sum(data$Player == 2 & data$Place == 1),
+      sum(data$Player == 3 & data$Place == 1) ),
+    "Second" = c(
+      sum(data$Player == 0 & data$Place == 2),
+      sum(data$Player == 1 & data$Place == 2),
+      sum(data$Player == 2 & data$Place == 2),
+      sum(data$Player == 3 & data$Place == 2) ),
+    "Third" = c(
+      sum(data$Player == 0 & data$Place == 3),
+      sum(data$Player == 1 & data$Place == 3),
+      sum(data$Player == 2 & data$Place == 3),
+      sum(data$Player == 3 & data$Place == 3) ),
+    "Forth" = c(
+      sum(data$Player == 0 & data$Place == 4),
+      sum(data$Player == 1 & data$Place == 4),
+      sum(data$Player == 2 & data$Place == 4),
+      sum(data$Player == 3 & data$Place == 4) )
+  )
+  return (result);
+}
+GetSumByPlace <- function(data){
+  result <- data.frame(
+    "Value" = 1:4, 
+    "First" = c(
+      sum(data$Player == 0 & data$Place == 1),
+      sum(data$Player == 0 & data$Place == 2),
+      sum(data$Player == 0 & data$Place == 3),
+      sum(data$Player == 0 & data$Place == 4) ),
+    "Second" = c(
+      sum(data$Player == 1 & data$Place == 1),
+      sum(data$Player == 1 & data$Place == 2),
+      sum(data$Player == 1 & data$Place == 3),
+      sum(data$Player == 1 & data$Place == 4) ),
+    "Third" = c(
+      sum(data$Player == 2 & data$Place == 1),
+      sum(data$Player == 2 & data$Place == 2),
+      sum(data$Player == 2 & data$Place == 3),
+      sum(data$Player == 2 & data$Place == 4) ),
+    "Forth" = c(
+      sum(data$Player == 3 & data$Place == 1),
+      sum(data$Player == 3 & data$Place == 2),
+      sum(data$Player == 3 & data$Place == 3),
+      sum(data$Player == 3 & data$Place == 4) )
+  )
+  return (result);
+}
 
-PSum <- data.frame(
-  "Player" = 1:4, 
-  "First" = c(
-    sum(MDI$Player == 0 & MDI$Place == 1),
-    sum(MDI$Player == 1 & MDI$Place == 1),
-    sum(MDI$Player == 2 & MDI$Place == 1),
-    sum(MDI$Player == 3 & MDI$Place == 1) ),
-  "Second" = c(
-    sum(MDI$Player == 0 & MDI$Place == 2),
-    sum(MDI$Player == 1 & MDI$Place == 2),
-    sum(MDI$Player == 2 & MDI$Place == 2),
-    sum(MDI$Player == 3 & MDI$Place == 2) ),
-  "Third" = c(
-    sum(MDI$Player == 0 & MDI$Place == 3),
-    sum(MDI$Player == 1 & MDI$Place == 3),
-    sum(MDI$Player == 2 & MDI$Place == 3),
-    sum(MDI$Player == 3 & MDI$Place == 3) ),
-  "Forth" = c(
-    sum(MDI$Player == 0 & MDI$Place == 4),
-    sum(MDI$Player == 1 & MDI$Place == 4),
-    sum(MDI$Player == 2 & MDI$Place == 4),
-    sum(MDI$Player == 3 & MDI$Place == 4) )
-)
-PSum2 <- data.frame(
-  "Place" = 1:4, 
-  "First" = c(
-    sum(MDI$Player == 0 & MDI$Place == 1),
-    sum(MDI$Player == 0 & MDI$Place == 2),
-    sum(MDI$Player == 0 & MDI$Place == 3),
-    sum(MDI$Player == 0 & MDI$Place == 4) ),
-  "Second" = c(
-    sum(MDI$Player == 1 & MDI$Place == 1),
-    sum(MDI$Player == 1 & MDI$Place == 2),
-    sum(MDI$Player == 1 & MDI$Place == 3),
-    sum(MDI$Player == 1 & MDI$Place == 4) ),
-  "Third" = c(
-    sum(MDI$Player == 2 & MDI$Place == 1),
-    sum(MDI$Player == 2 & MDI$Place == 2),
-    sum(MDI$Player == 2 & MDI$Place == 3),
-    sum(MDI$Player == 2 & MDI$Place == 4) ),
-  "Forth" = c(
-    sum(MDI$Player == 3 & MDI$Place == 1),
-    sum(MDI$Player == 3 & MDI$Place == 2),
-    sum(MDI$Player == 3 & MDI$Place == 3),
-    sum(MDI$Player == 3 & MDI$Place == 4) )
-)
-PSum_No_AI <- data.frame(
-  "Player" = 1:4, 
-  "First" = c(
-    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 1),
-    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 1),
-    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 1),
-    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 1) ),
-  "Second" = c(
-    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 2),
-    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 2),
-    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 2),
-    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 2) ),
-  "Third" = c(
-    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 3),
-    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 3),
-    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 3),
-    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 3) ),
-  "Forth" = c(
-    sum(MDI_No_AI$Player == 0 & MDI_No_AI$Place == 4),
-    sum(MDI_No_AI$Player == 1 & MDI_No_AI$Place == 4),
-    sum(MDI_No_AI$Player == 2 & MDI_No_AI$Place == 4),
-    sum(MDI_No_AI$Player == 3 & MDI_No_AI$Place == 4) )
-)
-PSum
-PSum_No_AI
-summary(PSum)
-summary(PSum_No_AI)
+PlayerSum <- GetSumByPlayer(MDI)
+PlayerSum2 <- GetSumByPlayer(MDI2)
+PlayerSum3 <- GetSumByPlayer(MDI3)
+PlaceSum <- GetSumByPlace(MDI)
+PlaceSum2 <- GetSumByPlace(MDI2)
+PlaceSum3 <- GetSumByPlace(MDI3)
 
-t.test(data = PSum, First ~ (Player == 1 | Player == 4))#Almost a significant difference
-t.test(data = PSum, Third ~ (Player == 1 | Player == 4))#A significant difference
+PlayerSum
+PlayerSum2
+#PlaceSum
+#PlaceSum2
+#summary(PlayerSum)
+#summary(PlayerSum2)
+#summary(PlaceSum)
+#summary(PlaceSum2)
+
+t.test(data = PlayerSum,  First ~ (Value == 1 | Value == 4))#Almost a significant difference
+t.test(data = PlayerSum2, First ~ (Value == 1 | Value == 4))#Not a significant difference
+t.test(data = PlaceSum,   First ~ (Value == 1 | Value == 4))#Not a significant difference
+t.test(data = PlaceSum2,  First ~ (Value == 1 | Value == 4))#Not a significant difference
 #Everything else was good
 
-shapiro.test(PSum$First)  # passed normality test
-shapiro.test(PSum$Second) # just passed normality test
-shapiro.test(PSum$Third)  # passed normality test
-shapiro.test(PSum$Forth)  # passed normality test
+shapiro.test(PlayerSum$First)  # Didn't
+shapiro.test(PlayerSum$Second) # Almost
+shapiro.test(PlayerSum$Third)  # Didn't
+shapiro.test(PlayerSum$Forth)  # Didn't
 
-bartlett.test(PSum) # not homogenous
+shapiro.test(PlayerSum2$First)  # Didn't
+shapiro.test(PlayerSum2$Second) # Did
+shapiro.test(PlayerSum2$Third)  # Didn't
+shapiro.test(PlayerSum2$Forth)  # Didn't
 
-anovaRes <- aov(PSum2$First~PSum2$Place)  #A significant difference
-summary(anovaRes)
-anovaRes <- aov(PSum2$Second~PSum2$Place) #Not a significant difference
-summary(anovaRes)
-anovaRes <- aov(PSum2$Third~PSum2$Place)  #Not a significant difference
-summary(anovaRes)
-anovaRes <- aov(PSum2$Forth~PSum2$Place)  #A significant difference
-summary(anovaRes)
+shapiro.test(PlaceSum$First)  # Didn't
+shapiro.test(PlaceSum$Second) # Did
+shapiro.test(PlaceSum$Third)  # Didn't
+shapiro.test(PlaceSum$Forth)  # Didn't
+
+shapiro.test(PlaceSum2$First)  # Didn't
+shapiro.test(PlaceSum2$Second) # Almost
+shapiro.test(PlaceSum2$Third)  # Didn't
+shapiro.test(PlaceSum2$Forth)  # Almost
+
+bartlett.test(PlayerSum)  # not homogenous
+bartlett.test(PlayerSum2) # not homogenous
+bartlett.test(PlaceSum)   # not homogenous
+bartlett.test(PlaceSum2)  # not homogenous
 
 
+#Just using PlaceSum here
+anovaRes <- aov(PlaceSum$First~PlaceSum$Value)  #A significant difference
+summary(anovaRes)
+anovaRes <- aov(PlaceSum$Second~PlaceSum$Value) #Not a significant difference
+summary(anovaRes)
+anovaRes <- aov(PlaceSum$Third~PlaceSum$Value)  #Not a significant difference
+summary(anovaRes)
+anovaRes <- aov(PlaceSum$Forth~PlaceSum$Value)  #A significant difference
+summary(anovaRes)
+
+anovaRes <- aov(PlaceSum2$First~PlaceSum2$Value)  #A significant difference
+summary(anovaRes)
+anovaRes <- aov(PlaceSum2$Second~PlaceSum2$Value) #Not a significant difference
+summary(anovaRes)
+anovaRes <- aov(PlaceSum2$Third~PlaceSum2$Value)  #Not a significant difference
+summary(anovaRes)
+anovaRes <- aov(PlaceSum2$Forth~PlaceSum2$Value)  #Not a significant difference
+summary(anovaRes)
 
 

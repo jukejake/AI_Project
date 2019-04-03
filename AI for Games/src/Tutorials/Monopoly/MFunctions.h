@@ -439,6 +439,11 @@ void ColourString(std::string& Output) {
 	Output = "";
 }
 void SetPlayerStats(PlayerInfo(&players)[PlayerNum]) {
+	
+	//players[0].Money = 2400; //TESTING
+	//players[1].Money = 1500; //TESTING
+	//players[2].Money = 1800; //TESTING
+	//players[3].Money = 2000; //TESTING
 	//Reset Values
 	for (int p = 0; p < PlayerNum; p++) {
 		players[p].AI = true;
@@ -448,7 +453,7 @@ void SetPlayerStats(PlayerInfo(&players)[PlayerNum]) {
 		players[p].Doubles = 0;		 //Amount of doubles in a row
 		players[p].InJail = 0;		 //Amount of turns the player is in jail for (3, 2, 1, 0)
 		players[p].JailPass = 0;	 //Amount of (get out of jail free) passes
-		players[p].Money = 1500 + (p*200); //TESTING
+		players[p].Money = 1500;// +(p * 200); //TESTING
 		//Data 
 		//Land the player owns and the stage it is at
 		players[p].Land = {
