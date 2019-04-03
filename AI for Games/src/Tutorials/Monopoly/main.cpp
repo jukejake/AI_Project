@@ -123,7 +123,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("10000v3");//Outfile
+				CreateExcelFile("10000v4");//Outfile
 			}
 		}
 		else if (game.rolls >= RollsPerGame) {
@@ -136,8 +136,8 @@ void UserUpdate() {
 				}
 			}
 			for (int i = 0; i < PlayerNum; i++) {
-				if (game.players[i].TotalAssetValue == highest) { game.players[i].Place = 1; }
-				if (game.players[i].TotalAssetValue == second) { game.players[i].Place = 2; }
+					 if (game.players[i].TotalAssetValue == highest) { game.players[i].Place = 1; }
+				else if (game.players[i].TotalAssetValue == second)  { game.players[i].Place = 2; }
 			}
 			int ii = PlayerNum;
 			for (int i = 0; i < PlayerNum; i++) {
@@ -158,7 +158,7 @@ void UserUpdate() {
 				games_Finished = 0;
 				UI_State = 1;
 				if (Display) { DisplayStats(game.players, y); }
-				CreateExcelFile("10000v3");//Outfile
+				CreateExcelFile("10000v4");//Outfile
 			}
 		}
 	} 
