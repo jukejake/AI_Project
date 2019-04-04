@@ -206,6 +206,18 @@ par(mfrow=c(2,3))
 for (i in 1:6) {
   plot(res.aov, i)
 }
+res.aov <- aov(Player ~ Place + Total.Asset.Value + Times.Around.Board, data = MDI)
+summary(res.aov) # Summary of the analysis
+par(mfrow=c(2,3))
+for (i in 1:6) {
+  plot(res.aov, i)
+}
+res.aov <- aov(Place ~ Player + Total.Asset.Value + Times.Around.Board, data = MDI)
+summary(res.aov) # Summary of the analysis
+par(mfrow=c(2,3))
+for (i in 1:6) {
+  plot(res.aov, i)
+}
 par(mfrow=c(1,1))
 
 ggboxplot(MDI, x = "Player", y = "Place", 
