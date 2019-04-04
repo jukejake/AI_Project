@@ -4,6 +4,10 @@ if (!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
 if(!require(Rcmdr)) install.packages("Rcmdr")
 library(Rcmdr)
+if(!require(ggpubr)) install.packages("ggpubr")
+library(ggpubr)
+if(!require(gplots)) install.packages("gplots")
+library(gplots)
 
 #Monopoly Data Total
 MDT <- read.csv("10000_AI_Total.csv")
@@ -178,5 +182,51 @@ anovaRes <- aov(PlaceSum2$Third~PlaceSum2$Value)  #Not a significant difference
 summary(anovaRes)
 anovaRes <- aov(PlaceSum2$Forth~PlaceSum2$Value)  #Not a significant difference
 summary(anovaRes)
+
+
+# 1. Homogeneity of variances
+# 2. Normality
+
+# Compute the analysis of variance
+res.aov <- aov(Place ~ Player, data = MDI)
+summary(res.aov) # Summary of the analysis
+par(mfrow=c(2,3))
+for (i in 1:6) {
+  plot(res.aov, i)
+}
+res.aov <- aov(Died.At ~ Player, data = MDI)
+summary(res.aov) # Summary of the analysis
+par(mfrow=c(2,3))
+for (i in 1:6) {
+  plot(res.aov, i)
+}
+res.aov <- aov(Total.Asset.Value ~ Player, data = MDI)
+summary(res.aov) # Summary of the analysis
+par(mfrow=c(2,3))
+for (i in 1:6) {
+  plot(res.aov, i)
+}
+par(mfrow=c(1,1))
+
+ggboxplot(MDI, x = "Player", y = "Place", 
+          color = "Player", palette = c(2:5),
+          order = c("0", "1", "2", "3"),
+          ylab = "Place", xlab = "Player")
+ggline(MDI, x = "Player", y = "Place", 
+       add = c("mean_sd"), 
+       order = c("0", "1", "2", "3"),
+       ylab = "Place", xlab = "Player")
+ggline(MDI, x = "Player", y = "Place", 
+       add = c("mean_se"), #mean_ci
+       order = c("0", "1", "2", "3"),
+       ylab = "Place", xlab = "Player")
+plotmeans(Place ~ Player, data = MDI, frame = FALSE,
+          xlab = "Player", ylab = "Place",
+          main="Mean Plot with 95% CI") 
+
+
+
+
+
 
 
