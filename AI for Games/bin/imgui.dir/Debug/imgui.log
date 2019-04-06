@@ -1,8 +1,1 @@
-﻿  Building Custom Rule C:/Github/AI_Project/AI for Games/CMakeLists.txt
-  CMake does not need to re-run because C:\Github\AI_Project\AI for Games\bin\CMakeFiles\generate.stamp is up-to-date.
-  imgui.cpp
-  imgui_demo.cpp
-  imgui_draw.cpp
-  imgui_impl_glfw_gl3.cpp
-  Generating Code...
-  imgui.vcxproj -> C:\Github\AI_Project\AI for Games\external\imgui\build\Debug\imgui_debug.lib
+﻿  imgui.vcxproj -> C:\Github\AI_Project\AI for Games\external\imgui\build\Debug\imgui_debug.lib

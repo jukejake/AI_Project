@@ -472,27 +472,27 @@ void Render() {
 	//projectionMatrix = glm::ortho(-640.0f, 640.0f, -360.0f, 360.0f, -1.0f, 1.0f);
 	projectionMatrix = glm::ortho(-360.0f, 360.0f, -360.0f, 360.0f, -1.0f, 1.0f);
 
-	//glActiveTexture(GL_TEXTURE0);
-	//int Spacing = 200, Size = 200;
+	glActiveTexture(GL_TEXTURE0);
+	int Spacing = 200, Size = 200;
 
-	//glBindTexture(GL_TEXTURE_2D, monopolyBoard);
-	//DrawQuad(glm::vec2(0.0f, 0.0f), glm::vec2(boardSize, boardSize));
+	glBindTexture(GL_TEXTURE_2D, monopolyBoard);
+	DrawQuad(glm::vec2(0.0f, 0.0f), glm::vec2(boardSize, boardSize));
 
-	//for (int i = 0; i < 4;i++) {
-	//	switch (game.players[i].isDead) {
-	//		case false:
-	//			glBindTexture(GL_TEXTURE_2D, pawnIcons[i]);
-	//			DrawQuad(spacePos[i][game.players[i].position], glm::vec2(pawnIconSize, pawnIconSize));
-	//			break;
-	//	}
-	//}
+	for (int i = 0; i < 4;i++) {
+		switch (game.players[i].isDead) {
+			case false:
+				glBindTexture(GL_TEXTURE_2D, pawnIcons[i]);
+				DrawQuad(spacePos[i][game.players[i].position], glm::vec2(pawnIconSize, pawnIconSize));
+				break;
+		}
+	}
 
-	//glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].FirstDice-1]);
-	//DrawQuad(glm::vec2(-100, 0), glm::vec2(60, 60));
+	glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].FirstDice-1]);
+	DrawQuad(glm::vec2(-100, 0), glm::vec2(60, 60));
 
-	//glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].SecondDice-1]);
-	//DrawQuad(glm::vec2(100, 0), glm::vec2(60, 60));
-	////std::cout << "Position " + std::to_string(i) + ": " + std::to_string(spacePos[i].x) + ", " + std::to_string(spacePos[i].y) << std::endl;
+	glBindTexture(GL_TEXTURE_2D, diceSides[game.players[game.CurrentPlayer].SecondDice-1]);
+	DrawQuad(glm::vec2(100, 0), glm::vec2(60, 60));
+	//std::cout << "Position " + std::to_string(i) + ": " + std::to_string(spacePos[i].x) + ", " + std::to_string(spacePos[i].y) << std::endl;
 
 	glUseProgram(GL_NONE);
 }

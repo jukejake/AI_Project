@@ -1,4 +1,1 @@
-﻿  Building Custom Rule C:/Github/AI_Project/AI for Games/CMakeLists.txt
-  CMake does not need to re-run because C:\Github\AI_Project\AI for Games\bin\CMakeFiles\generate.stamp is up-to-date.
-  gl3w.c
-  gl3w.vcxproj -> C:\Github\AI_Project\AI for Games\external\gl3w\build\Debug\gl3w_debug.lib
+﻿  gl3w.vcxproj -> C:\Github\AI_Project\AI for Games\external\gl3w\build\Debug\gl3w_debug.lib
